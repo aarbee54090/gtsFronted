@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import { Navbar } from "@/components/landing/Navbar"
 import { SportPicker } from "@/components/customize/SportPicker"
@@ -6,6 +7,15 @@ import { AmbientBackground } from "@/components/shared/AmbientBackground"
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>
+}
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { category: rawCategory } = await params
+  const category = decodeURIComponent(rawCategory)
+  return {
+    title: `Custom ${category} in Nepal | GTS`,
+    description: `Design a custom ${category} for your team - pick your sport, then choose fabric, fit, and pricing. Made in Nepal by GTS.`,
+  }
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

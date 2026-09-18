@@ -1,7 +1,13 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 
 import { Navbar } from "@/components/landing/Navbar"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
+
+export const metadata: Metadata = {
+  title: "Customize Your Sportswear | GTS",
+  description: "Start designing custom team sportswear with GTS - pick a product category to choose your sport, fabric, and design.",
+}
 
 export default function CustomizeFallbackPage() {
   return (

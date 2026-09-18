@@ -3,10 +3,30 @@ import "./globals.css";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { CustomerAuthProvider } from "@/components/account/CustomerAuthContext";
 import { SavedDesignsProvider } from "@/components/account/SavedDesignsContext";
+import { SITE_URL } from "@/lib/site";
+
+const title = "GTS — Custom Team Sportswear";
+const description = "Design custom jerseys, tracksuits, hoodies, and gym wear for your team, college, or company.";
 
 export const metadata: Metadata = {
-  title: "GTS — Custom Team Sportswear",
-  description: "Design custom jerseys, tracksuits, hoodies, and gym wear for your team, college, or company.",
+  metadataBase: new URL(SITE_URL),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    url: SITE_URL,
+    siteName: "GTS",
+    images: ["/images/gts-logo.png"],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/images/gts-logo.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

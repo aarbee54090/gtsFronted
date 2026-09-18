@@ -1,7 +1,14 @@
+import type { Metadata } from "next"
 import Image from "next/image"
 import { Navbar } from "@/components/landing/Navbar"
 import { ProductCategories } from "@/components/landing/ProductCategories"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
+
+export const metadata: Metadata = {
+  title: "Custom Jerseys, Tracksuits & Team Sportswear | GTS",
+  description:
+    "Browse GTS's custom sportswear categories - jersey kits, tracksuits, hoodies, and gym wear - and start designing for your team, college, or company.",
+}
 
 export default function ProductsPage() {
   return (

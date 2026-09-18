@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { motion } from "motion/react"
 import { CardPhoto } from "@/components/shared/CardPhoto"
 
@@ -12,25 +11,6 @@ interface SportPickerProps {
   categorySlug: string
   categoryName: string
   sports: BackendProductSummary[]
-}
-
-// Reuses the same real sport icon files from the homepage Hero. Matched
-// case-insensitively against the product's `sport` field; anything not in
-// this list (e.g. "E-Sports", no icon file yet) falls back to an emoji.
-const SPORT_ICON_FILES: Record<string, string> = {
-  basketball: "/images/sport-basketball.png",
-  football: "/images/sport-football.png",
-  volleyball: "/images/sport-volleyball.png",
-  cricket: "/images/sport-cricket.png",
-  cycling: "/images/sport-cycling.png",
-}
-
-function SportIcon({ sport }: { sport: string }) {
-  const file = SPORT_ICON_FILES[sport.trim().toLowerCase()]
-  if (file) {
-    return <Image src={file} alt={sport} width={24} height={24} className="h-6 w-6 object-contain" />
-  }
-  return <span className="text-lg leading-none">🎮</span>
 }
 
 export function SportPicker({ categorySlug, categoryName, sports }: SportPickerProps) {
@@ -78,9 +58,6 @@ export function SportPicker({ categorySlug, categoryName, sports }: SportPickerP
                   className="group glass-sheen glass-bevel relative flex h-32 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[16px] transition-all duration-[var(--duration-medium)] hover:border-[var(--color-brand-green)] hover:shadow-[var(--glow-green-strong)] active:scale-[0.98] active:border-[var(--color-brand-green)]"
                 >
                   <div className="flex w-[42%] flex-shrink-0 flex-col justify-between p-4">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-brand-green)]/15">
-                      <SportIcon sport={item.sport} />
-                    </span>
                     <div>
                       <p className="text-base font-bold text-white">{item.sport}</p>
                       <p className="text-xs text-[var(--color-text-gray)]">{item.name}</p>
@@ -128,9 +105,6 @@ export function SportPicker({ categorySlug, categoryName, sports }: SportPickerP
                   className="group glass-sheen glass-bevel relative flex h-32 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[16px] transition-all duration-[var(--duration-medium)] hover:border-[var(--color-brand-green)] hover:shadow-[var(--glow-green-strong)] active:scale-[0.98] active:border-[var(--color-brand-green)]"
                 >
                   <div className="flex w-[28%] flex-shrink-0 flex-col justify-between p-5 xl:w-[18%]">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-brand-green)]/15">
-                      <SportIcon sport={item.sport} />
-                    </span>
                     <div>
                       <p className="text-base font-bold text-white">{item.name}</p>
                       <p className="text-xs text-[var(--color-text-gray)]">{item.sport}</p>
@@ -169,9 +143,6 @@ export function SportPicker({ categorySlug, categoryName, sports }: SportPickerP
                     card's chip the same size regardless of how many words
                     the sport/product name wraps to. */}
                 <div className="glass-bevel relative mx-3 mb-3 flex min-h-[76px] items-center gap-3 rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/30 p-3 backdrop-blur-[20px]">
-                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-green)]/15">
-                    <SportIcon sport={item.sport} />
-                  </span>
                   <div className="flex flex-1 flex-col gap-0.5">
                     <span className="line-clamp-2 text-base font-bold leading-tight text-white">{item.name}</span>
                     <span className="text-xs text-[var(--color-text-gray)]">{item.sport}</span>

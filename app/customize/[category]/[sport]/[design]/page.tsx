@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 
 import { Navbar } from "@/components/landing/Navbar"
@@ -8,6 +9,22 @@ import { AmbientBackground } from "@/components/shared/AmbientBackground"
 
 interface DesignPageProps {
   params: Promise<{ category: string; sport: string; design: string }>
+}
+
+export async function generateMetadata({ params }: DesignPageProps): Promise<Metadata> {
+  const { category: rawCategory, sport: sportSlug } = await params
+  const category = decodeURIComponent(rawCategory)
+  const realProduct = await fetchProductByCategorySport(category, sportSlug)
+
+  if (!realProduct) {
+    return { title: `Custom ${category} | GTS`, description: `Design a custom ${category} with GTS.` }
+  }
+
+  return {
+    title: `Customize Your ${realProduct.sport} ${realProduct.category} | GTS`,
+    description: `Set fabric, fit, addons, and quantity for your ${realProduct.sport.toLowerCase()} ${realProduct.category.toLowerCase()} and get instant pricing from GTS.`,
+    robots: { index: false, follow: true },
+  }
 }
 
 export default async function DesignPage({ params }: DesignPageProps) {
