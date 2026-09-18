@@ -1,0 +1,194 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* -------------------------------------------------------------------------
+   GTS Design Tokens
+   Brand color hierarchy: ~70% white/light, ~20% black/dark, ~10% electric green.
+   ---------------------------------------------------------------------- */
+
+:root {
+  --color-bg-dark: #0b0d0f;
+  --color-brand-green: #b6ff00;
+  --color-green-hover: #d2ff4d;
+  --color-text-white: #ffffff;
+  --color-text-gray: #a7adb4;
+  --color-card-dark: #15191d;
+  --color-error-red: #ff4d4d;
+  --color-bg-light: #f7f8f9;
+  --color-bg-white: #ffffff;
+  --color-text-black: #0b0d0f;
+
+  --glass-bg: rgba(21, 25, 29, 0.55);
+  --glass-bg-strong: rgba(11, 13, 15, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glow-green: 0 0 32px rgba(182, 255, 0, 0.35);
+  --glow-green-strong: 0 0 48px rgba(182, 255, 0, 0.55);
+
+  /* Motion tokens - fast UI interactions vs. slow ambient/showroom loops.
+     Actual disabling for prefers-reduced-motion happens once, globally,
+     in the media query at the bottom of this file. */
+  --duration-fast: 220ms;
+  --duration-medium: 320ms;
+  --ease-showroom: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --radius: 0.75rem;
+
+  /* shadcn/ui semantic tokens, mapped onto the GTS palette */
+  --background: var(--color-bg-dark);
+  --foreground: var(--color-text-white);
+  --card: var(--color-card-dark);
+  --card-foreground: var(--color-text-white);
+  --primary: var(--color-brand-green);
+  --primary-foreground: var(--color-bg-dark);
+  --secondary: var(--color-card-dark);
+  --secondary-foreground: var(--color-text-white);
+  --muted: var(--color-card-dark);
+  --muted-foreground: var(--color-text-gray);
+  --accent: var(--color-brand-green);
+  --accent-foreground: var(--color-bg-dark);
+  --destructive: var(--color-error-red);
+  --destructive-foreground: var(--color-text-white);
+  --border: var(--glass-border);
+  --input: var(--glass-border);
+  --ring: var(--color-brand-green);
+}
+
+@theme inline {
+  --color-bg-dark: var(--color-bg-dark);
+  --color-brand-green: var(--color-brand-green);
+  --color-green-hover: var(--color-green-hover);
+  --color-text-white: var(--color-text-white);
+  --color-text-gray: var(--color-text-gray);
+  --color-card-dark: var(--color-card-dark);
+  --color-error-red: var(--color-error-red);
+  --color-bg-light: var(--color-bg-light);
+  --color-bg-white: var(--color-bg-white);
+  --color-text-black: var(--color-text-black);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-pill: 999px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Site-wide "bit italic" heading style, per design request. Deliberately
+   scoped to headings only - italicizing body copy, buttons, form inputs, or
+   table data (e.g. in the admin panel) would hurt readability/usability
+   without adding the intended stylistic effect. */
+h1,
+h2,
+h3,
+h4 {
+  font-style: italic;
+}
+
+/* -------------------------------------------------------------------------
+   Glassmorphism surfaces - public/customer-facing pages only. Admin pages
+   deliberately keep their existing solid backgrounds and are not touched.
+   ---------------------------------------------------------------------- */
+
+.glass-surface {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-surface-strong {
+  position: relative;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Glass edge bevel - a 1px gradient ring, brighter at the top-left corner,
+   layered on top of the plain border so glass panels read as an actual pane
+   catching light instead of a flat translucent box. Pure ::before overlay
+   (not box-shadow) so it never collides with a sibling `hover:shadow-*`
+   utility, which replaces box-shadow wholesale. Applied automatically to
+   .glass-surface/.glass-surface-strong, and standalone as .glass-bevel for
+   cards that build the border/bg/blur triad from raw utility classes. */
+.glass-surface::before,
+.glass-surface-strong::before,
+.glass-bevel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 35%, transparent 65%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass-bevel {
+  position: relative;
+}
+
+/* One diagonal light sweep, triggered on hover via the .glass-sheen parent -
+   "subtle light movement across glass surfaces" without anything constant
+   or distracting. */
+.glass-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.glass-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 900ms var(--ease-showroom);
+  pointer-events: none;
+}
+.glass-sheen:hover::after {
+  transform: translateX(100%);
+}
+
+/* -------------------------------------------------------------------------
+   Shared entrance/hover timing used across public pages.
+   ---------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
