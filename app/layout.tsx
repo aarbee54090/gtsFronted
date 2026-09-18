@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { CustomerAuthProvider } from "@/components/account/CustomerAuthContext";
 import { SavedDesignsProvider } from "@/components/account/SavedDesignsContext";
 import { SITE_URL } from "@/lib/site";
@@ -34,10 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <CustomerAuthProvider>
-          <SavedDesignsProvider>
-            {children}
-            <WhatsAppButton />
-          </SavedDesignsProvider>
+          <SavedDesignsProvider>{children}</SavedDesignsProvider>
         </CustomerAuthProvider>
       </body>
     </html>
