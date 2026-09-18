@@ -14,15 +14,33 @@ const designsWithImages: Design[] = [
   { id: "d1", name: "Design One", sport: "Football", imageUrl: "https://example.com/one.png" },
 ]
 
+const categoryId = "test-category"
+const sportSlug = "football"
+
 describe("DesignPicker", () => {
   it("shows a Cloudinary-pending placeholder when a design has no imageUrl", () => {
-    render(<DesignPicker designs={designs} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designs}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
     expect(screen.getAllByText(/pending upload/i).length).toBeGreaterThan(0)
   })
 
   it("paginates designs and shows a page indicator when there are more than one page", () => {
     render(
-      <DesignPicker designs={designs} selectedId={null} onSelect={vi.fn()} pageSize={2} />
+      <DesignPicker
+        designs={designs}
+        selectedId={null}
+        onSelect={vi.fn()}
+        pageSize={2}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
     )
     expect(screen.getByText("Design One")).toBeInTheDocument()
     expect(screen.getByText("Design Two")).toBeInTheDocument()
@@ -33,7 +51,14 @@ describe("DesignPicker", () => {
   it("navigates to the next page and reveals the remaining design", async () => {
     const user = userEvent.setup()
     render(
-      <DesignPicker designs={designs} selectedId={null} onSelect={vi.fn()} pageSize={2} />
+      <DesignPicker
+        designs={designs}
+        selectedId={null}
+        onSelect={vi.fn()}
+        pageSize={2}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
     )
 
     await user.click(screen.getByRole("button", { name: /next page/i }))
@@ -44,7 +69,15 @@ describe("DesignPicker", () => {
   })
 
   it("does not show pagination controls when everything fits on one page", () => {
-    render(<DesignPicker designs={designs} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designs}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
     expect(screen.queryByText(/page \d of \d/i)).not.toBeInTheDocument()
   })
 
@@ -54,7 +87,15 @@ describe("DesignPicker", () => {
       name: `Design ${i}`,
       sport: "Football",
     }))
-    render(<DesignPicker designs={manyDesigns} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={manyDesigns}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
     expect(screen.getByText("Page 1 of 2")).toBeInTheDocument()
     expect(screen.getByText("Design 0")).toBeInTheDocument()
     expect(screen.getByText("Design 9")).toBeInTheDocument()
@@ -62,26 +103,58 @@ describe("DesignPicker", () => {
   })
 
   it("renders the upload-your-own-design option", () => {
-    render(<DesignPicker designs={designs} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designs}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
     expect(
       screen.getByRole("button", { name: /upload own design/i })
     ).toBeInTheDocument()
   })
 
   it("shows preview and download icon buttons only for designs with a real image", () => {
-    render(<DesignPicker designs={designsWithImages} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designsWithImages}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
     expect(screen.getByRole("button", { name: /preview design one full size/i })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /download design one/i })).toBeInTheDocument()
   })
 
   it("does not show preview/download icons for a design with no image yet", () => {
-    render(<DesignPicker designs={designs} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designs}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
     expect(screen.queryByRole("button", { name: /preview .* full size/i })).not.toBeInTheDocument()
   })
 
   it("opens a lightbox with the full image when the preview icon is clicked", async () => {
     const user = userEvent.setup()
-    render(<DesignPicker designs={designsWithImages} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designsWithImages}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
 
     await user.click(screen.getByRole("button", { name: /preview design one full size/i }))
 
@@ -90,7 +163,15 @@ describe("DesignPicker", () => {
 
   it("closes the lightbox when the close button is clicked", async () => {
     const user = userEvent.setup()
-    render(<DesignPicker designs={designsWithImages} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={designsWithImages}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
 
     await user.click(screen.getByRole("button", { name: /preview design one full size/i }))
     await user.click(screen.getByRole("button", { name: /close preview/i }))
@@ -101,7 +182,15 @@ describe("DesignPicker", () => {
   it("clicking the preview/download icons does not select the design", async () => {
     const onSelect = vi.fn()
     const user = userEvent.setup()
-    render(<DesignPicker designs={designsWithImages} selectedId={null} onSelect={onSelect} />)
+    render(
+      <DesignPicker
+        designs={designsWithImages}
+        selectedId={null}
+        onSelect={onSelect}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
 
     await user.click(screen.getByRole("button", { name: /preview design one full size/i }))
 
@@ -114,7 +203,15 @@ describe("DesignPicker - uploaded file preview", () => {
     const user = userEvent.setup()
     const file = new File(["fake-image-content"], "my-design.png", { type: "image/png" })
 
-    render(<DesignPicker designs={[]} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={[]}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement
     await user.upload(input, file)
@@ -127,7 +224,15 @@ describe("DesignPicker - uploaded file preview", () => {
     const user = userEvent.setup()
     const file = new File(["fake-image-content"], "my-design.png", { type: "image/png" })
 
-    render(<DesignPicker designs={[]} selectedId={null} onSelect={vi.fn()} />)
+    render(
+      <DesignPicker
+        designs={[]}
+        selectedId={null}
+        onSelect={vi.fn()}
+        categoryId={categoryId}
+        sportSlug={sportSlug}
+      />
+    )
 
     const input = document.querySelector('input[type="file"]') as HTMLInputElement
     await user.upload(input, file)
