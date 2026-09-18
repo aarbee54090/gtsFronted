@@ -17,7 +17,7 @@ import type { ContentDetailResponse, ContentListResponse } from "./gts-hub-types
 import type { Platform } from "./platform-types";
 import type { Appointment, Availability } from "./appointment-types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://gtsbackend-2.onrender.com/api";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://gtsbackend.onrender.com/api";
 const ADMIN_KEY_STORAGE = "gts_admin_key";
 
 export function getAdminKey(): string | null {
