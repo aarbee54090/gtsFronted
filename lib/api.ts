@@ -232,7 +232,7 @@ export async function adminDeleteHubSectionImage(sectionKey: HubSectionKey): Pro
   await apiFetch(`/hub-section-images/${sectionKey}`, { method: "DELETE", requireAdmin: true });
 }
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Main products (top-level categories, e.g. "Jersey", "Hoodie", "Tracksuit")
 // ---------------------------------------------------------------------------
 
