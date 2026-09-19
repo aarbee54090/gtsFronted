@@ -119,7 +119,7 @@ export function computeQuote(
       ? matchedCoupon.amountOff
       : 0
 
-  // "max, not both" — the larger of the two applies, never stacked.
+  // "maxa, not both" — the larger of the two applies, never stacked.
   const discount = Math.max(quantityDiscount, couponDiscount)
 
   const total = Math.max(subtotal - discount, 0)
