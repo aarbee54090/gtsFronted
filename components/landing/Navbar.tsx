@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/gts-hub", label: "GTS Hub" },
   { href: "/process", label: "Process" },
   { href: "/book-appointment", label: "Book an Appointment" },
+  { href: "/track", label: "Track Order" },
 ]
 
 // /customize/* isn't nested under /products in the URL, but it's reached

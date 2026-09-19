@@ -80,7 +80,7 @@ describe("computeQuote", () => {
     expect(result.addonsTotal).toBe(0)
   })
 
-  it("applies rush surcharge only when deadline is within threshold", () => {
+  it("does not change the price based on the deadline", () => {
     const soon = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
     const result = computeQuote(
       {
@@ -93,25 +93,8 @@ describe("computeQuote", () => {
       },
       null
     )
-    expect(result.rushApplied).toBe(true)
-    expect(result.rushSurcharge).toBeCloseTo(4500 * 0.15)
-  })
-
-  it("does not apply rush surcharge when deadline is far away", () => {
-    const far = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    const result = computeQuote(
-      {
-        product,
-        designPrice: 450,
-        quantity: 10,
-        addons: [],
-        deadlineDate: far,
-        couponCode: null,
-      },
-      null
-    )
-    expect(result.rushApplied).toBe(false)
-    expect(result.rushSurcharge).toBe(0)
+    expect(result.subtotal).toBe(4500)
+    expect(result.total).toBe(4500)
   })
 
   it("applies quantity-tier discount once minimum quantity is met", () => {

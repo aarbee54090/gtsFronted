@@ -61,8 +61,6 @@ export interface QuoteBreakdown {
   addonsTotal: number
   variantSurcharge: number
   subtotal: number
-  rushSurcharge: number
-  rushApplied: boolean
   quantityDiscount: number
   couponDiscount: number
   discount: number
@@ -95,7 +93,6 @@ export function computeQuote(
     variantSurcharge = 0,
     quantity,
     addons,
-    deadlineDate,
     couponCode,
   } = input
 
@@ -110,20 +107,7 @@ export function computeQuote(
     return sum + style.price * sel.quantity
   }, 0)
 
-  let subtotal = lineTotal + addonsTotal + variantSurcharge
-
-  let rushApplied = false
-  let rushSurcharge = 0
-  if (deadlineDate) {
-    const daysUntil = Math.ceil(
-      (new Date(deadlineDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-    )
-    if (daysUntil >= 0 && daysUntil <= product.rushThresholdDays) {
-      rushApplied = true
-      rushSurcharge = subtotal * product.rushPercent
-      subtotal += rushSurcharge
-    }
-  }
+  const subtotal = lineTotal + addonsTotal + variantSurcharge
 
   const quantityDiscount =
     quantity >= product.quantityDiscount.minQuantity
@@ -146,8 +130,6 @@ export function computeQuote(
     addonsTotal,
     variantSurcharge,
     subtotal,
-    rushSurcharge,
-    rushApplied,
     quantityDiscount,
     couponDiscount,
     discount,

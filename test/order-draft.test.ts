@@ -20,8 +20,6 @@ const sampleDraft: OrderDraft = {
     addonsTotal: 0,
     variantSurcharge: 0,
     subtotal: 2250,
-    rushSurcharge: 0,
-    rushApplied: false,
     quantityDiscount: 0,
     couponDiscount: 0,
     discount: 0,

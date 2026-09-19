@@ -132,8 +132,6 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     pricingTiers: [],
     quantityDiscount: { type: "quantity_tier", minQuantity: 50, percentOff: 5 },
-    rushPercent: 0.15,
-    rushThresholdDays: 7,
     currency: "₹",
   },
 }

@@ -81,7 +81,6 @@ export function QuotationPage() {
       `Line total: ${quote.currency}${quote.lineTotal}`,
       quote.variantSurcharge > 0 ? `Sleeve/Collar surcharge: ${quote.currency}${quote.variantSurcharge}` : null,
       quote.addonsTotal > 0 ? `Addons: ${quote.currency}${quote.addonsTotal}` : null,
-      quote.rushApplied ? `Rush surcharge: ${quote.currency}${quote.rushSurcharge}` : null,
       quote.discount > 0 ? `Discount: -${quote.currency}${quote.discount}` : null,
       draft!.deadlineDate ? `Deadline: ${draft!.deadlineDate}` : null,
       draft!.couponCode ? `Coupon: ${draft!.couponCode}` : null,
@@ -215,12 +214,6 @@ export function QuotationPage() {
             <div className="flex justify-between text-[var(--color-text-gray)]">
               <span>Addons</span>
               <span>{formatMoney(quote.currency, quote.addonsTotal)}</span>
-            </div>
-          )}
-          {quote.rushApplied && (
-            <div className="flex justify-between text-[var(--color-text-gray)]">
-              <span>Rush surcharge</span>
-              <span>{formatMoney(quote.currency, quote.rushSurcharge)}</span>
             </div>
           )}
           {quote.discount > 0 && (

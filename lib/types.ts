@@ -90,7 +90,5 @@ export interface ProductDetail {
   addons: Addon[]
   pricingTiers: PricingTier[]
   quantityDiscount: QuantityDiscount
-  rushPercent: number // e.g. 0.15 = 15%
-  rushThresholdDays: number
   currency: string
 }
