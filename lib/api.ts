@@ -15,7 +15,6 @@ import type { ContactInfo, ContactSubmission, ContactSubmissionStatus } from "./
 import type { HubSectionImage, HubSectionKey } from "./hub-section-image-types";
 import type { ContentDetailResponse, ContentListResponse } from "./gts-hub-types";
 import type { Platform } from "./platform-types";
-import type { Appointment, Availability } from "./appointment-types";
 
 const envApiUrl = process.env.NEXT_PUBLIC_API_URL;
 if (!envApiUrl) {
@@ -405,62 +404,30 @@ export async function fetchProductByCategorySport(
 }
 
 // ---------------------------------------------------------------------------
-// Appointments
+// Order tracking
 // ---------------------------------------------------------------------------
 
-// Public - upcoming availability, for the customer date picker and the
-// admin's own "Set Availability" list.
-export async function getAvailability(): Promise<Availability[]> {
-  const res = await apiFetch<ApiListResponse<Availability>>("/appointments/availability");
-  return res.data;
+// What the public tracking endpoint returns - deliberately no contact
+// details, address, or uploaded files.
+export interface OrderTracking {
+  orderId: string;
+  status: "pending" | "approved" | "rejected";
+  productName: string;
+  sport: string;
+  designName: string;
+  designImageUrl?: string;
+  quantity: number;
+  deadlineDate?: string;
+  currency: string;
+  total: number;
+  advanceAmount: number;
+  balanceAmount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// Public/guest - no login required.
-export async function bookAppointment(input: {
-  date: string;
-  time: string;
-  name: string;
-  phone: string;
-  note?: string;
-}): Promise<Appointment> {
-  const res = await apiFetch<ApiItemResponse<Appointment>>("/appointments", {
-    method: "POST",
-    body: input,
-  });
-  return res.data;
-}
-
-export async function adminSetAvailability(input: {
-  date: string;
-  status: "available" | "day_off";
-  startTime?: string;
-  endTime?: string;
-}): Promise<Availability> {
-  const res = await apiFetch<ApiItemResponse<Availability>>("/appointments/availability", {
-    method: "POST",
-    requireAdmin: true,
-    body: input,
-  });
-  return res.data;
-}
-
-export async function adminDeleteAvailability(id: string): Promise<void> {
-  await apiFetch(`/appointments/availability/${id}`, { method: "DELETE", requireAdmin: true });
-}
-
-export async function adminListAppointments(): Promise<Appointment[]> {
-  const res = await apiFetch<ApiListResponse<Appointment>>("/appointments/admin/all", { requireAdmin: true });
-  return res.data;
-}
-
-export async function adminUpdateAppointmentStatus(
-  id: string,
-  status: "approved" | "rejected"
-): Promise<Appointment> {
-  const res = await apiFetch<ApiItemResponse<Appointment>>(`/appointments/admin/${id}/status`, {
-    method: "PATCH",
-    requireAdmin: true,
-    body: { status },
-  });
+// Public/guest - no login. Throws ApiError(404) if the ID doesn't match an order.
+export async function trackOrder(orderId: string): Promise<OrderTracking> {
+  const res = await apiFetch<ApiItemResponse<OrderTracking>>(`/orders/track/${encodeURIComponent(orderId)}`);
   return res.data;
 }

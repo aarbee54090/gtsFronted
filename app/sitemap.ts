@@ -8,7 +8,7 @@ const STATIC_ROUTES = [
   "/products",
   "/process",
   "/customize",
-  "/book-appointment",
+  "/track",
   "/gts-hub",
   "/gts-hub/about",
   "/gts-hub/contact",

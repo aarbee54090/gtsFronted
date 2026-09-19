@@ -19,7 +19,6 @@ const GROUPS: DashboardGroup[] = [
       { href: "/admin/main-products", title: "Main Products", description: "Manage top-level product categories" },
       { href: "/admin/addons", title: "Addons", description: "Manage addon styles, pricing, and preview images" },
       { href: "/admin/orders", title: "Orders", description: "Review and approve customer orders" },
-      { href: "/admin/appointments", title: "Appointments", description: "Set availability and manage booking requests" },
       { href: "/admin/payment", title: "Payment", description: "Configure payment methods and QR codes" },
     ],
   },

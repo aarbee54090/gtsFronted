@@ -156,9 +156,12 @@ export function CheckoutPage() {
           </button>
         </div>
         <Link
-          href="/"
+          href="/track"
           className="mt-2 rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-6 py-3 text-sm font-bold text-[var(--color-bg-dark)]"
         >
+          Track Order
+        </Link>
+        <Link href="/" className="text-sm font-medium text-[var(--color-text-gray)] hover:text-white">
           Back to Home
         </Link>
       </Card>
