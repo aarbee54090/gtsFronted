@@ -17,7 +17,11 @@ import type { ContentDetailResponse, ContentListResponse } from "./gts-hub-types
 import type { Platform } from "./platform-types";
 import type { Appointment, Availability } from "./appointment-types";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://gtsbackend.onrender.com/api";
+const envApiUrl = process.env.NEXT_PUBLIC_API_URL;
+if (!envApiUrl) {
+  throw new Error("NEXT_PUBLIC_API_URL is not set. Add it to gts-fr/.env (and to your hosting env vars).");
+}
+export const API_URL: string = envApiUrl;
 const ADMIN_KEY_STORAGE = "gts_admin_key";
 
 export function getAdminKey(): string | null {
