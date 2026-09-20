@@ -35,7 +35,7 @@ export default function AdminProductsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white">Products</h1>
         <Link
           href="/admin/products/new"
@@ -60,7 +60,38 @@ export default function AdminProductsPage() {
       )}
 
       {!loading && products.length > 0 && (
-        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)]">
+        <div className="flex flex-col gap-3 sm:hidden">
+          {products.map((product) => (
+            <div
+              key={product._id}
+              className="rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--color-card-dark)]/60 p-4"
+            >
+              <p className="font-semibold text-white">{product.name}</p>
+              <p className="mt-1 text-xs text-[var(--color-text-gray)]">
+                {product.category} · {product.sport} · {product.designs?.length ?? 0} designs
+              </p>
+              <div className="mt-3 flex gap-3">
+                <Link
+                  href={`/admin/products/${product._id}/edit`}
+                  className="flex-1 rounded-[var(--radius-pill)] border border-[var(--color-brand-green)] py-2 text-center text-sm font-semibold text-[var(--color-brand-green)]"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() => handleDelete(product)}
+                  disabled={deletingId === product._id}
+                  className="flex-1 rounded-[var(--radius-pill)] border border-[var(--color-error-red)] py-2 text-sm font-semibold text-[var(--color-error-red)] disabled:opacity-40"
+                >
+                  {deletingId === product._id ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!loading && products.length > 0 && (
+        <div className="hidden overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--glass-border)] sm:block">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--glass-border)] bg-[var(--color-card-dark)]/60 text-[var(--color-text-gray)]">

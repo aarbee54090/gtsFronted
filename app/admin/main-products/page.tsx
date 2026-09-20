@@ -35,7 +35,7 @@ export default function AdminMainProductsPage() {
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-white">Main Products</h1>
         <Link
           href="/admin/main-products/new"
@@ -64,7 +64,7 @@ export default function AdminMainProductsPage() {
       )}
 
       {!loading && mainProducts.length > 0 && (
-        <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)]">
+        <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--glass-border)]">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--glass-border)] bg-[var(--color-card-dark)]/60 text-[var(--color-text-gray)]">

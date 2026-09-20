@@ -75,6 +75,21 @@ export default function AdminOrdersPage() {
     }
   }
 
+  async function deleteOrder(order: AdminOrder) {
+    const confirmed = window.confirm(`Delete order ${order.orderId}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setUpdatingId(order._id);
+    try {
+      await apiFetch(`/orders/admin/${order._id}`, { method: "DELETE", requireAdmin: true });
+      setOrders((prev) => prev.filter((o) => o._id !== order._id));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Failed to delete order.");
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold text-white">Orders</h1>
@@ -95,7 +110,7 @@ export default function AdminOrdersPage() {
         {orders.map((order) => (
           <div
             key={order._id}
-            className="flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--color-card-dark)]/60 p-5"
+            className="flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--color-card-dark)]/60 p-4 sm:p-5"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -222,24 +237,33 @@ export default function AdminOrdersPage() {
               </div>
             )}
 
-            {order.status === "pending" && (
-              <div className="flex gap-3 border-t border-[var(--glass-border)] pt-3">
-                <button
-                  onClick={() => updateStatus(order, "approved")}
-                  disabled={updatingId === order._id}
-                  className="rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-5 py-2 text-sm font-bold text-[var(--color-bg-dark)] disabled:opacity-40"
-                >
-                  Approve
-                </button>
-                <button
-                  onClick={() => updateStatus(order, "rejected")}
-                  disabled={updatingId === order._id}
-                  className="rounded-[var(--radius-pill)] border border-[var(--color-error-red)] px-5 py-2 text-sm font-bold text-[var(--color-error-red)] disabled:opacity-40"
-                >
-                  Reject
-                </button>
-              </div>
-            )}
+            <div className="flex flex-wrap gap-3 border-t border-[var(--glass-border)] pt-3">
+              {order.status === "pending" && (
+                <>
+                  <button
+                    onClick={() => updateStatus(order, "approved")}
+                    disabled={updatingId === order._id}
+                    className="rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-5 py-2 text-sm font-bold text-[var(--color-bg-dark)] disabled:opacity-40"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => updateStatus(order, "rejected")}
+                    disabled={updatingId === order._id}
+                    className="rounded-[var(--radius-pill)] border border-[var(--color-error-red)] px-5 py-2 text-sm font-bold text-[var(--color-error-red)] disabled:opacity-40"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => deleteOrder(order)}
+                disabled={updatingId === order._id}
+                className="ml-auto rounded-[var(--radius-pill)] px-5 py-2 text-sm font-bold text-[var(--color-text-gray)] hover:text-[var(--color-error-red)] disabled:opacity-40"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
