@@ -19,7 +19,7 @@ export default async function ContactPage() {
   const info = await getContactInfo()
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
 
@@ -75,7 +75,7 @@ export default async function ContactPage() {
             )}
           </div>
 
-          <div className="glass-bevel rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 backdrop-blur-[16px]">
+          <div className="glass-2 rounded-[var(--radius-lg)] p-6">
             <h2 className="mb-4 text-lg font-bold text-white">Send a Message</h2>
             <ContactForm />
           </div>

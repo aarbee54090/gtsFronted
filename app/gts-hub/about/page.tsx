@@ -18,7 +18,7 @@ export default async function AboutPage() {
   const page = await getAboutPage()
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
 

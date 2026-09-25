@@ -16,7 +16,7 @@ export function ContentCard({ contentType, data, showTypeBadge }: ContentCardPro
   return (
     <Link
       href={`${HUB_BASE_PATH[contentType]}/${data.slug}`}
-      className="group glass-sheen glass-bevel relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[16px] transition-all duration-[var(--duration-medium)] hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
+      className="group glass-sheen glass-2 flex flex-col overflow-hidden rounded-[var(--radius-lg)] transition-all duration-[var(--duration-medium)] hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
     >
       <SaveButton
         itemType={contentType}

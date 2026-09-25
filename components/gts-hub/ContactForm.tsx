@@ -3,8 +3,7 @@
 import { useState } from "react"
 import { ApiError, submitContactMessage } from "@/lib/api"
 
-const inputClasses =
-  "w-full rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/20 px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-[var(--color-brand-green)] focus:outline-none"
+const inputClasses = "glass-1 w-full rounded-[var(--radius-md)] px-3 py-2 text-sm text-white placeholder:text-gray-500"
 
 export function ContactForm() {
   const [name, setName] = useState("")

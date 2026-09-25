@@ -31,7 +31,7 @@ export default async function JournalDetailPage({ params }: PageProps) {
   const article = res.data
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
       <article className="mx-auto max-w-[800px] px-4 pb-20 pt-24">

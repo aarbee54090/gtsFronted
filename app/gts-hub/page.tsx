@@ -57,7 +57,7 @@ export default async function GtsHubPage() {
   const imageByKey = new Map<HubSectionKey, HubSectionImage>(sectionImages.map((img) => [img.sectionKey, img]))
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
       <section className="mx-auto max-w-[1100px] px-4 pb-20 pt-24">
@@ -73,7 +73,7 @@ export default async function GtsHubPage() {
               <Link
                 key={section.href}
                 href={section.href}
-                className="group glass-bevel relative flex h-56 flex-col justify-end overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-6 backdrop-blur-[16px] transition-all duration-200 hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
+                className="group glass-2 flex h-56 flex-col justify-end overflow-hidden rounded-[var(--radius-lg)] p-6 transition-all duration-200 hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
               >
                 {img?.desktopImageUrl ? (
                   <>
@@ -106,7 +106,7 @@ export default async function GtsHubPage() {
                   />
                 )}
 
-                <div className="glass-bevel relative z-[1] flex min-h-[76px] flex-col justify-center gap-1 rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/30 p-3 backdrop-blur-[20px]">
+                <div className="glass-3 z-[1] flex min-h-[76px] flex-col justify-center gap-1 rounded-[var(--radius-md)] bg-[var(--glass-bg-soft)] p-3">
                   <h2 className="line-clamp-1 text-xl font-bold text-white">{section.title}</h2>
                   <p className="line-clamp-2 text-sm text-[var(--color-text-gray)]">{section.description}</p>
                 </div>

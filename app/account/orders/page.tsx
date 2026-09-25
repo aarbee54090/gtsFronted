@@ -94,7 +94,7 @@ function MyOrdersList() {
 
 export default function MyOrdersPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
       <div className="mx-auto max-w-[640px] px-6 pb-24 pt-32">

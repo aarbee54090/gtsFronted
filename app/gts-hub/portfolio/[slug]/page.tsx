@@ -31,7 +31,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
   const project = res.data
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
       <article className="mx-auto max-w-[900px] px-4 pb-20 pt-24">
@@ -50,7 +50,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
         {project.finalImages?.length > 0 && (
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {project.finalImages.map((media, i) => (
-              <HubMedia key={i} media={media} className="w-full rounded-[var(--radius-lg)] object-cover" />
+              <HubMedia key={i} media={media} className="aspect-square w-full rounded-[var(--radius-lg)] object-cover" />
             ))}
           </div>
         )}
@@ -58,7 +58,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
         {project.description && <p className="mb-8 text-sm leading-relaxed text-white/90">{project.description}</p>}
 
         {(project.fabric || project.printingMethod) && (
-          <div className="glass-bevel mb-8 grid grid-cols-2 gap-4 rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 text-sm backdrop-blur-[16px]">
+          <div className="glass-2 mb-8 grid grid-cols-2 gap-4 rounded-[var(--radius-md)] p-4 text-sm">
             {project.fabric && (
               <div>
                 <p className="text-xs text-[var(--color-text-gray)]">Fabric</p>
@@ -81,7 +81,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                 <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-[var(--color-text-gray)]">Design</h2>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {project.designImages.map((media, i) => (
-                    <HubMedia key={i} media={media} className="w-full rounded-[var(--radius-md)] object-cover" />
+                    <HubMedia key={i} media={media} className="aspect-square w-full rounded-[var(--radius-md)] object-cover" />
                   ))}
                 </div>
               </div>
@@ -93,7 +93,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                 </h2>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {project.productionImages.map((media, i) => (
-                    <HubMedia key={i} media={media} className="w-full rounded-[var(--radius-md)] object-cover" />
+                    <HubMedia key={i} media={media} className="aspect-square w-full rounded-[var(--radius-md)] object-cover" />
                   ))}
                 </div>
               </div>

@@ -224,7 +224,7 @@ export function DesignPicker({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="glass-surface-strong flex max-h-[85vh] w-full max-w-lg flex-col gap-4 rounded-[var(--radius-lg)] p-6"
+            className="glass-3 flex max-h-[85vh] w-full max-w-lg flex-col gap-4 rounded-[var(--radius-lg)] p-6"
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white">{lightboxDesign.name}</h3>

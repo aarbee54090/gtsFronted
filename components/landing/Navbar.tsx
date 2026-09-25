@@ -45,9 +45,12 @@ export function Navbar() {
       role="banner"
       className="fixed top-4 left-0 right-0 z-50 mx-auto max-w-[1100px] px-4"
     >
+      {/* At the top of the page only the ambient backdrop is behind the bar,
+          so it can be lighter; once content scrolls under it, glass-3's
+          full-strength base keeps the links readable over photos. */}
       <div
-        className={`glass-bevel flex items-center justify-between rounded-full border border-[var(--glass-border)] px-5 py-3 backdrop-blur-[16px] transition-all duration-300 ${
-          isScrolled ? "bg-[var(--glass-bg-strong)] shadow-[0_8px_32px_rgba(0,0,0,0.35)]" : "bg-[var(--glass-bg)]"
+        className={`glass-3 flex items-center justify-between rounded-full px-5 py-3 transition-all duration-300 ${
+          isScrolled ? "" : "bg-[var(--glass-bg-soft)] shadow-none"
         }`}
       >
         <Link href="/" className="flex items-center" onClick={() => setMobileOpen(false)}>
@@ -101,7 +104,7 @@ export function Navbar() {
       {mobileOpen && (
         <nav
           aria-label="Mobile navigation"
-          className="mt-2 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--color-card-dark)]/95 p-4 backdrop-blur-[16px] md:hidden"
+          className="glass-3 mt-2 rounded-[var(--radius-lg)] p-4 md:hidden"
         >
           <ul className="flex flex-col gap-1 list-none m-0 p-0">
             {NAV_LINKS.map((link) => {
@@ -111,7 +114,7 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`block rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium transition-colors hover:bg-black/20 hover:text-[var(--color-brand-green)] ${
+                    className={`block rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium transition-colors hover:bg-white/[0.06] hover:text-[var(--color-brand-green)] ${
                       isActive ? "text-[var(--color-brand-green)]" : "text-[var(--color-text-gray)]"
                     }`}
                   >

@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 
 export default function ProductsPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       {/* Full-bleed showroom backdrop, same hero photo used on the homepage -
           darkened enough that text/cards on top stay fully readable. */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 -z-20">
         <Image src="/images/hero-bg-desktop.webp" alt="" fill priority className="object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-bg-dark)]/60 via-[var(--color-bg-dark)]/85 to-[var(--color-bg-dark)]" />
       </div>

@@ -31,7 +31,7 @@ const WHATSAPP_NUMBER = "9779705743117"
 export function Footer() {
   return (
     <footer className="px-4 py-6">
-      <div className="glass-bevel mx-auto flex max-w-[1100px] flex-col items-center justify-between gap-6 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] px-6 py-6 backdrop-blur-[16px] sm:flex-row">
+      <div className="glass-2 mx-auto flex max-w-[1100px] flex-col items-center justify-between gap-6 rounded-[var(--radius-lg)] px-6 py-6 sm:flex-row">
         <div className="flex flex-col items-center gap-2 sm:items-start">
           <Image
             src="/images/goalthali-badge.png"

@@ -31,7 +31,7 @@ export default async function MaterialDetailPage({ params }: PageProps) {
   const material = res.data
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
       <article className="mx-auto max-w-[800px] px-4 pb-20 pt-24">
@@ -44,7 +44,7 @@ export default async function MaterialDetailPage({ params }: PageProps) {
         {material.images?.length > 0 && (
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {material.images.map((media, i) => (
-              <HubMedia key={i} media={media} className="w-full rounded-[var(--radius-lg)] object-cover" />
+              <HubMedia key={i} media={media} className="aspect-square w-full rounded-[var(--radius-lg)] object-cover" />
             ))}
           </div>
         )}
@@ -56,7 +56,7 @@ export default async function MaterialDetailPage({ params }: PageProps) {
             <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-[var(--color-text-gray)]">Features</h2>
             <div className="flex flex-wrap gap-2">
               {material.features.map((f) => (
-                <span key={f} className="rounded-[var(--radius-pill)] border border-[var(--glass-border)] px-3 py-1 text-xs text-white">
+                <span key={f} className="glass-1 rounded-[var(--radius-pill)] px-3 py-1 text-xs text-white">
                   {f}
                 </span>
               ))}

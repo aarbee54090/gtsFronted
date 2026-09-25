@@ -37,7 +37,7 @@ function SavedDesignsList() {
               ? `${HUB_BASE_PATH[item.itemType as ContentType]}/${item.slug}`
               : null
         const content = (
-          <div className="glass-surface flex flex-col overflow-hidden rounded-[var(--radius-lg)] transition-colors hover:border-[var(--color-brand-green)]">
+          <div className="glass-2 flex flex-col overflow-hidden rounded-[var(--radius-lg)] transition-colors hover:border-[var(--color-brand-green)]">
             <div className="relative aspect-[4/3] w-full bg-black/40">
               {item.imageUrl ? (
                 <Image src={item.imageUrl} alt={item.name} fill className="object-cover" unoptimized={item.imageUrl.startsWith("data:")} />
@@ -66,7 +66,7 @@ function SavedDesignsList() {
 
 export default function SavedDesignsPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
       <AmbientBackground />
       <Navbar />
       <div className="mx-auto max-w-[900px] px-6 pb-24 pt-32">

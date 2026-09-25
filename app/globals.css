@@ -18,9 +18,20 @@
   --color-bg-white: #ffffff;
   --color-text-black: #0b0d0f;
 
-  --glass-bg: rgba(21, 25, 29, 0.55);
-  --glass-bg-strong: rgba(11, 13, 15, 0.75);
+  /* Frosted glass (public pages - see the .glass-1/2/3 tiers below).
+     --glass-bg is a light white frost; the darker bases are for surfaces
+     that page content scrolls under, where text must stay readable even
+     over a bright photo. --glass-border stays subtle because the admin
+     panel and shadcn's --border share it. */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-1-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-soft: rgba(14, 17, 20, 0.4);
+  --glass-bg-strong: rgba(12, 14, 16, 0.72);
+  --glass-bg-solid: rgba(14, 17, 20, 0.94);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-edge: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --glass-shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --glow-green: 0 0 32px rgba(182, 255, 0, 0.35);
   --glow-green-strong: 0 0 48px rgba(182, 255, 0, 0.55);
 
@@ -114,69 +125,144 @@ h4 {
 /* -------------------------------------------------------------------------
    Glassmorphism surfaces - public/customer-facing pages only. Admin pages
    deliberately keep their existing solid backgrounds and are not touched.
+
+   Three tiers, lightest to heaviest:
+   .glass-1  Form fields, chips, small insets. No blur of its own - it
+             always sits on a tier-2/3 pane already, and a nested
+             backdrop-filter would only re-blur that pane.
+   .glass-2  Cards and panels: white frost over the ambient backdrop.
+   .glass-3  Navbar, menus, modals, sheets, captions over photos - anything
+             page content sits under. Darker base keeps text readable even
+             over a bright photo.
+
+   Kept in @layer components so per-use utilities (absolute, hover:border-*,
+   shadow-*, bg-*) still override them - unlayered CSS would beat every
+   Tailwind utility regardless of specificity.
    ---------------------------------------------------------------------- */
 
-.glass-surface {
-  position: relative;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
+@layer components {
+  .glass-1,
+  .glass-2,
+  .glass-3 {
+    position: relative;
+    isolation: isolate;
+    border: 1px solid var(--glass-edge);
+  }
 
-.glass-surface-strong {
-  position: relative;
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
+  .glass-1 {
+    background-color: var(--glass-1-bg);
+  }
 
-/* Glass edge bevel - a 1px gradient ring, brighter at the top-left corner,
-   layered on top of the plain border so glass panels read as an actual pane
-   catching light instead of a flat translucent box. Pure ::before overlay
-   (not box-shadow) so it never collides with a sibling `hover:shadow-*`
-   utility, which replaces box-shadow wholesale. Applied automatically to
-   .glass-surface/.glass-surface-strong, and standalone as .glass-bevel for
-   cards that build the border/bg/blur triad from raw utility classes. */
-.glass-surface::before,
-.glass-surface-strong::before,
-.glass-bevel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 35%, transparent 65%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
+  .glass-1:is(input, textarea, select):focus {
+    border-color: var(--color-brand-green);
+    box-shadow: 0 0 0 3px rgba(182, 255, 0, 0.15);
+    outline: none;
+  }
 
-.glass-bevel {
-  position: relative;
-}
+  .glass-2 {
+    background-color: var(--glass-bg);
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 55%);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px) saturate(130%);
+  }
 
-/* One diagonal light sweep, triggered on hover via the .glass-sheen parent -
-   "subtle light movement across glass surfaces" without anything constant
-   or distracting. */
-.glass-sheen {
-  position: relative;
-  overflow: hidden;
-}
-.glass-sheen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%);
-  transform: translateX(-100%);
-  transition: transform 900ms var(--ease-showroom);
-  pointer-events: none;
-}
-.glass-sheen:hover::after {
-  transform: translateX(100%);
+  .glass-3 {
+    background-color: var(--glass-bg-strong);
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.07), transparent 60%);
+    box-shadow: var(--glass-shadow-strong);
+    backdrop-filter: blur(28px) saturate(150%);
+  }
+
+  /* Phones: cards drop the live blur. They sit over the ambient backdrop,
+     which is already a soft blurred field, so the frost looks the same -
+     but a grid of live-blurred cards is what makes budget Android phones
+     stutter while scrolling. Tier 3 keeps its blur: content moves under it. */
+  @media (max-width: 767px) {
+    .glass-2 {
+      backdrop-filter: none;
+    }
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .glass-2 {
+      background-color: rgba(28, 32, 36, 0.92);
+    }
+    .glass-3 {
+      background-color: var(--glass-bg-solid);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-1 {
+      background-color: #1a1e22;
+    }
+    .glass-2,
+    .glass-3 {
+      background-image: none;
+      backdrop-filter: none;
+    }
+    .glass-2 {
+      background-color: #1c2024;
+    }
+    .glass-3 {
+      background-color: #111417;
+    }
+  }
+
+  /* Glass edge bevel - a 1px gradient ring, brighter at the top-left corner,
+     layered on top of the plain border so glass panels read as an actual
+     pane catching light instead of a flat translucent box. Pure ::before
+     overlay (not box-shadow) so it never collides with a sibling
+     `hover:shadow-*` utility, which replaces box-shadow wholesale. Built into
+     .glass-2/.glass-3, and standalone as .glass-bevel for surfaces that
+     build the border/bg/blur triad from raw utility classes. */
+  .glass-2::before,
+  .glass-3::before,
+  .glass-bevel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 35%, transparent 65%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glass-bevel {
+    position: relative;
+  }
+
+  /* One diagonal light sweep, triggered on hover via the .glass-sheen
+     parent - "subtle light movement across glass surfaces" without anything
+     constant or distracting. */
+  .glass-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+  .glass-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%);
+    transform: translateX(-100%);
+    transition: transform 900ms var(--ease-showroom);
+    pointer-events: none;
+  }
+  .glass-sheen:hover::after {
+    transform: translateX(100%);
+  }
+
+  /* Film grain over the ambient backdrop. Dithers the big blurred glows so
+     they don't band into visible rings on 8-bit screens, and gives the
+     frost something fine-grained to catch. */
+  .ambient-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+  }
 }
 
 /* -------------------------------------------------------------------------

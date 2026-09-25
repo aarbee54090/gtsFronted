@@ -37,7 +37,7 @@ export default async function SportPage({ params, searchParams }: SportPageProps
 
   if (!realProduct) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
+      <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
         <AmbientBackground />
         <Navbar />
         <div className="mx-auto max-w-[1100px] px-6 pb-24 pt-32">
@@ -84,7 +84,7 @@ export default async function SportPage({ params, searchParams }: SportPageProps
   }))
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
       <AmbientBackground />
       <Navbar />
 

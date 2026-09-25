@@ -56,8 +56,13 @@ export function ProfileMenu({ onNavigate }: { onNavigate?: () => void }) {
         <ChevronDown className="h-3.5 w-3.5" />
       </button>
 
+      {/* Near-solid base on purpose: this renders inside the navbar's glass
+          (the pill, or the mobile menu panel), whose own backdrop-filter
+          makes it the dropdown's backdrop root - so the dropdown can only
+          blur the navbar, not the page under it, and a see-through base
+          would show unblurred page text through it. */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-52 rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-[var(--color-card-dark)]/95 p-2 backdrop-blur-[16px]">
+        <div className="glass-3 absolute right-0 top-full mt-2 w-52 rounded-[var(--radius-md)] bg-[var(--glass-bg-solid)] p-2">
           {MENU_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -66,7 +71,7 @@ export function ProfileMenu({ onNavigate }: { onNavigate?: () => void }) {
                 setOpen(false)
                 onNavigate?.()
               }}
-              className="block rounded-[var(--radius-sm)] px-3 py-2 text-sm text-[var(--color-text-gray)] hover:bg-black/20 hover:text-white"
+              className="block rounded-[var(--radius-sm)] px-3 py-2 text-sm text-[var(--color-text-gray)] hover:bg-white/[0.06] hover:text-white"
             >
               {link.label}
             </Link>
@@ -79,7 +84,7 @@ export function ProfileMenu({ onNavigate }: { onNavigate?: () => void }) {
               await logout()
               router.push("/")
             }}
-            className="block w-full rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm text-[var(--color-error-red)] hover:bg-black/20"
+            className="block w-full rounded-[var(--radius-sm)] px-3 py-2 text-left text-sm text-[var(--color-error-red)] hover:bg-white/[0.06]"
           >
             Logout
           </button>

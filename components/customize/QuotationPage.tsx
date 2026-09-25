@@ -169,7 +169,7 @@ export function QuotationPage() {
         </div>
 
         {descriptionLines.length > 0 && (
-          <ul className="glass-surface flex flex-col gap-1 rounded-[var(--radius-md)] p-3 text-xs text-[var(--color-text-gray)]">
+          <ul className="glass-2 flex flex-col gap-1 rounded-[var(--radius-md)] p-3 text-xs text-[var(--color-text-gray)]">
             {descriptionLines.map((line, i) => (
               <li key={i}>{line}</li>
             ))}

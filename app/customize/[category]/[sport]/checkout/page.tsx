@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function Checkout() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
       <AmbientBackground />
       <Navbar />
       <div className="mx-auto max-w-[700px] px-6 pb-24 pt-32">

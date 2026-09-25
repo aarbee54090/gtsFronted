@@ -53,7 +53,7 @@ export function AddonsPicker({ addons, currency, selections, onChange }: AddonsP
         return (
           <div
             key={addon.id}
-            className="glass-surface flex flex-col rounded-[var(--radius-md)]"
+            className="glass-2 flex flex-col rounded-[var(--radius-md)]"
           >
             <button
               type="button"
@@ -149,7 +149,7 @@ export function AddonsPicker({ addons, currency, selections, onChange }: AddonsP
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="glass-surface-strong max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-[var(--radius-lg)] p-6"
+            className="glass-3 max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-[var(--radius-lg)] p-6"
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-bold text-white">{previewAddon.name} styles</h2>
