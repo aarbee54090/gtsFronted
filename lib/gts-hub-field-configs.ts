@@ -1,10 +1,12 @@
 import { SPORTS, PRODUCT_TYPES, ORGANIZATION_TYPES, MATERIAL_CATEGORIES } from "./taxonomy-constants"
 import type { ContentTypeConfig } from "./gts-hub-field-config-types"
 
+// Shown to customers as "Our Work" (/gts-hub/portfolio); the content type
+// key and URL keep the original "portfolio" name.
 export const PORTFOLIO_CONFIG: ContentTypeConfig = {
   contentType: "portfolio",
-  label: "Portfolio Project",
-  pluralLabel: "Portfolio",
+  label: "Project",
+  pluralLabel: "Our Work Projects",
   apiBasePath: "/portfolio",
   adminBasePath: "/admin/portfolio",
   titleField: "title",

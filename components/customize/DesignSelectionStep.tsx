@@ -16,6 +16,8 @@ interface DesignSelectionStepProps {
   sportSlug: string
   /** From "?design=" - preselects a design, e.g. when resuming a saved design from the account area. */
   initialDesignId?: string
+  /** For the design images' alt text, e.g. "football jersey". */
+  designNoun?: string
 }
 
 export function DesignSelectionStep({
@@ -23,6 +25,7 @@ export function DesignSelectionStep({
   categoryId,
   sportSlug,
   initialDesignId,
+  designNoun,
 }: DesignSelectionStepProps) {
   const router = useRouter()
   const [designId, setDesignId] = useState<string | null>(initialDesignId ?? null)
@@ -78,6 +81,7 @@ export function DesignSelectionStep({
           currency={product.currency}
           categoryId={categoryId}
           sportSlug={sportSlug}
+          designNoun={designNoun}
         />
 
         {/* Desktop/tablet: original inline Continue bar, unchanged. Hidden on
@@ -170,6 +174,7 @@ export function DesignSelectionStep({
               currency={product.currency}
               categoryId={categoryId}
               sportSlug={sportSlug}
+              designNoun={designNoun}
             />
           </div>
         </div>

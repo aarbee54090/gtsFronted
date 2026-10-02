@@ -3,7 +3,8 @@
 
 /* -------------------------------------------------------------------------
    GTS Design Tokens
-   Brand color hierarchy: ~70% white/light, ~20% black/dark, ~10% electric green.
+   Dark charcoal surfaces, white type, and electric lime used sparingly as
+   the accent - photography of real jerseys does the heavy lifting.
    ---------------------------------------------------------------------- */
 
 :root {
@@ -11,29 +12,68 @@
   --color-brand-green: #b6ff00;
   --color-green-hover: #d2ff4d;
   --color-text-white: #ffffff;
-  --color-text-gray: #a7adb4;
+  --color-text-gray: #a7adb4; /* 8.9:1 on the page background */
   --color-card-dark: #15191d;
-  --color-error-red: #ff4d4d;
+  --color-error-red: #ff5c5c;
   --color-bg-light: #f7f8f9;
   --color-bg-white: #ffffff;
   --color-text-black: #0b0d0f;
+
+  /* Solid surfaces for content cards and forms (glass stays for chrome:
+     navbar, menus, overlays). */
+  --color-surface: #111418;
+  --color-surface-raised: #171b20;
+  --color-line: rgba(255, 255, 255, 0.09);
+  --color-line-strong: rgba(255, 255, 255, 0.18);
+  --color-warning: #f5b942;
+  --color-info: #7cc4ff;
 
   /* Frosted glass (public pages - see the .glass-1/2/3 tiers below).
      --glass-bg is a light white frost; the darker bases are for surfaces
      that page content scrolls under, where text must stay readable even
      over a bright photo. --glass-border stays subtle because the admin
      panel and shadcn's --border share it. */
-  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-1-bg: rgba(255, 255, 255, 0.04);
   --glass-bg-soft: rgba(14, 17, 20, 0.4);
-  --glass-bg-strong: rgba(12, 14, 16, 0.72);
+  --glass-bg-strong: rgba(12, 14, 16, 0.78);
   --glass-bg-solid: rgba(14, 17, 20, 0.94);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-edge: rgba(255, 255, 255, 0.12);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --glass-shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --glow-green: 0 0 32px rgba(182, 255, 0, 0.35);
-  --glow-green-strong: 0 0 48px rgba(182, 255, 0, 0.55);
+  /* Kept deliberately soft - the accent should mark what's interactive,
+     not light up the page. */
+  --glow-green: 0 0 20px rgba(182, 255, 0, 0.18);
+  --glow-green-strong: 0 0 28px rgba(182, 255, 0, 0.28);
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 34px rgba(0, 0, 0, 0.32);
+
+  /* Layout rhythm, shared by every public page. */
+  --container: 1200px;
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --section-y: clamp(3.5rem, 8vw, 6.5rem);
+  --nav-offset: 6.5rem; /* room for the fixed navbar; also the anchor scroll offset */
+
+  /* Typefaces come from next/font in app/layout.tsx (self-hosted, no layout
+     shift); the system stack is the fallback while they load. Headings use
+     upright Barlow Condensed; only the homepage hero statement uses the
+     italic cut. */
+  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-barlow), "Arial Narrow", var(--font-body);
+  --font-heading-italic: var(--font-barlow-italic), var(--font-heading);
+
+  /* Type scale - the same sizes on every public page. Each clamp() grows
+     with the viewport between its phone (~375px) and desktop (~1280px+)
+     values, so headings adapt instead of the desktop size simply shrinking. */
+  --text-hero: clamp(2.375rem, 1.6rem + 3.4vw, 4.25rem); /* 38px -> 68px, homepage statement */
+  --text-page-title: clamp(1.75rem, 1.41rem + 1.44vw, 2.625rem); /* 28px -> 42px, page h1 */
+  --text-section-title: clamp(1.5rem, 1.28rem + 0.9vw, 2.125rem); /* 24px -> 34px, section h2 */
+  --text-card-title-lg: clamp(1.1875rem, 1.05rem + 0.55vw, 1.4375rem); /* 19px -> 23px, product cards */
+  --text-card-title: 1.125rem; /* 18px, project/hub/journal cards */
+  --text-lead: clamp(0.9375rem, 0.875rem + 0.25vw, 1.0625rem); /* 15px -> 17px, intros */
+  --text-body: 0.9375rem; /* 15px, descriptions in cards */
+  --text-label: 0.75rem; /* 12px, small caps labels */
+  --measure: 52ch; /* comfortable line length for paragraphs - roughly 65-70 characters */
 
   /* Motion tokens - fast UI interactions vs. slow ambient/showroom loops.
      Actual disabling for prefers-reduced-motion happens once, globally,
@@ -75,6 +115,12 @@
   --color-bg-light: var(--color-bg-light);
   --color-bg-white: var(--color-bg-white);
   --color-text-black: var(--color-text-black);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-warning: var(--color-warning);
+  --color-info: var(--color-info);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -100,26 +146,52 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-pill: 999px;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-}
+/* -------------------------------------------------------------------------
+   Base
+   ---------------------------------------------------------------------- */
 
-/* Site-wide "bit italic" heading style, per design request. Deliberately
-   scoped to headings only - italicizing body copy, buttons, form inputs, or
-   table data (e.g. in the admin panel) would hurt readability/usability
-   without adding the intended stylistic effect. */
-h1,
-h2,
-h3,
-h4 {
-  font-style: italic;
+/* In the base layer, like Tailwind's own reset, so any utility class on an
+   element (italic/not-italic, text colours, ...) can still override these.
+   Unlayered rules here would beat every utility regardless of specificity. */
+@layer base {
+  html {
+    /* In-page anchors (#book-a-visit) land below the fixed navbar. */
+    scroll-padding-top: var(--nav-offset);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* The admin dashboard keeps its italic heading style. Customer-facing
+     headings are upright for readability; the homepage hero statement is
+     the one deliberate italic (.display-xl). */
+  .admin-ui :where(h1, h2, h3, h4) {
+    font-style: italic;
+  }
+
+  ::selection {
+    background: rgba(182, 255, 0, 0.85);
+    color: var(--color-bg-dark);
+  }
+
+  /* One visible keyboard focus style for every interactive element. Mouse
+     clicks don't trigger :focus-visible, so this never shows on tap/click.
+     Form fields style their own focus (border + soft ring) below. */
+  :where(a, button, summary, [role="button"], [tabindex]):focus-visible {
+    outline: 2px solid var(--color-brand-green);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
 }
 
 /* -------------------------------------------------------------------------
@@ -161,14 +233,14 @@ h4 {
 
   .glass-2 {
     background-color: var(--glass-bg);
-    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 55%);
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.05), transparent 55%);
     box-shadow: var(--glass-shadow);
     backdrop-filter: blur(20px) saturate(130%);
   }
 
   .glass-3 {
     background-color: var(--glass-bg-strong);
-    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.07), transparent 60%);
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.06), transparent 60%);
     box-shadow: var(--glass-shadow-strong);
     backdrop-filter: blur(28px) saturate(150%);
   }
@@ -225,7 +297,7 @@ h4 {
     z-index: 1;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.06) 35%, transparent 65%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05) 35%, transparent 65%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -247,7 +319,7 @@ h4 {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.08) 50%, transparent 60%);
+    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.06) 50%, transparent 60%);
     transform: translateX(-100%);
     transition: transform 900ms var(--ease-showroom);
     pointer-events: none;
@@ -257,12 +329,372 @@ h4 {
   }
 
   /* Film grain over the ambient backdrop. Dithers the big blurred glows so
-     they don't band into visible rings on 8-bit screens, and gives the
-     frost something fine-grained to catch. */
+     they don't band into visible rings on 8-bit screens. */
   .ambient-grain {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.04;
+    opacity: 0.035;
   }
+
+  /* -----------------------------------------------------------------------
+     Layout
+     -------------------------------------------------------------------- */
+
+  /* The one content width every public section lines up to. */
+  .container-site {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .section {
+    padding-block: var(--section-y);
+  }
+
+  /* First block under the fixed navbar. */
+  .page-top {
+    padding-top: var(--nav-offset);
+  }
+
+  /* -----------------------------------------------------------------------
+     Typography
+     -------------------------------------------------------------------- */
+
+  /* Small labels: section eyebrows, category tags ("CUSTOM DESIGNED"). */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: var(--text-label);
+    font-weight: 700;
+    line-height: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-brand-green);
+  }
+
+  /* Homepage hero statement - the one bold italic. */
+  .display-xl {
+    font-family: var(--font-heading-italic);
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    font-size: var(--text-hero);
+    line-height: 0.96;
+    letter-spacing: -0.005em;
+    color: var(--color-text-white);
+    text-wrap: balance;
+  }
+
+  /* Page (h1) and section (h2) headings: condensed sportswear caps, upright
+     and at a moderate weight so they stay easy to read. */
+  .display-lg,
+  .display-md {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--color-text-white);
+    text-wrap: balance;
+  }
+  .display-lg {
+    font-size: var(--text-page-title);
+    line-height: 1.08;
+  }
+  .display-md {
+    font-size: var(--text-section-title);
+    line-height: 1.12;
+  }
+
+  /* Intro paragraphs under page and section headings. */
+  .lead {
+    font-size: var(--text-lead);
+    line-height: 1.65;
+    color: var(--color-text-gray);
+    max-width: var(--measure);
+  }
+
+  /* Card typography: sentence-case titles in the body face, never italic. */
+  .card-title {
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: var(--text-card-title);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--color-text-white);
+  }
+  .card-title-lg {
+    font-size: var(--text-card-title-lg);
+    line-height: 1.2;
+  }
+  .card-text {
+    font-size: var(--text-body);
+    line-height: 1.55;
+    color: var(--color-text-gray);
+  }
+
+  /* Admin-authored rich text (Tiptap HTML) on public pages. */
+  .prose-gts {
+    color: rgba(255, 255, 255, 0.88);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .prose-gts > * + * {
+    margin-top: 1em;
+  }
+  .prose-gts :where(h2, h3) {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--color-text-white);
+    line-height: 1.15;
+    margin-top: 1.6em;
+  }
+  .prose-gts h2 {
+    font-size: 1.5rem;
+  }
+  .prose-gts h3 {
+    font-size: 1.25rem;
+  }
+  .prose-gts :where(ul, ol) {
+    padding-left: 1.25em;
+  }
+  .prose-gts ul {
+    list-style: disc;
+  }
+  .prose-gts ol {
+    list-style: decimal;
+  }
+  .prose-gts a {
+    color: var(--color-brand-green);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-gts strong {
+    color: var(--color-text-white);
+  }
+
+  /* -----------------------------------------------------------------------
+     Surfaces
+     -------------------------------------------------------------------- */
+
+  .surface-card {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .surface-card-interactive {
+    transition:
+      transform var(--duration-fast) var(--ease-showroom),
+      border-color var(--duration-fast) ease;
+  }
+  .surface-card-interactive:hover {
+    border-color: rgba(182, 255, 0, 0.45);
+    transform: translateY(-2px);
+  }
+
+  /* Callouts: info, success, warning, error. */
+  .notice {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-line-strong);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text-white);
+  }
+  .notice-success {
+    border-color: rgba(182, 255, 0, 0.4);
+    background: rgba(182, 255, 0, 0.08);
+  }
+  .notice-warning {
+    border-color: rgba(245, 185, 66, 0.45);
+    background: rgba(245, 185, 66, 0.08);
+  }
+  .notice-error {
+    border-color: rgba(255, 92, 92, 0.5);
+    background: rgba(255, 92, 92, 0.08);
+  }
+
+  /* Status pills - appointment and order states. */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-line-strong);
+    padding: 0.2rem 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-text-gray);
+  }
+  .badge-requested {
+    color: var(--color-warning);
+    border-color: rgba(245, 185, 66, 0.45);
+    background: rgba(245, 185, 66, 0.1);
+  }
+  .badge-confirmed {
+    color: var(--color-brand-green);
+    border-color: rgba(182, 255, 0, 0.45);
+    background: rgba(182, 255, 0, 0.1);
+  }
+  .badge-completed {
+    color: var(--color-info);
+    border-color: rgba(124, 196, 255, 0.45);
+    background: rgba(124, 196, 255, 0.1);
+  }
+  .badge-cancelled {
+    color: var(--color-text-gray);
+  }
+
+  /* -----------------------------------------------------------------------
+     Forms
+     -------------------------------------------------------------------- */
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .field-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-white);
+  }
+  .field-hint {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--color-text-gray);
+  }
+  .field-error {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--color-error-red);
+  }
+  .field-input {
+    width: 100%;
+    min-height: 2.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-line-strong);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 0.625rem 0.875rem;
+    /* 16px keeps iOS Safari from zooming into the field on focus. */
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--color-text-white);
+    transition:
+      border-color var(--duration-fast) ease,
+      box-shadow var(--duration-fast) ease;
+  }
+  .field-input::placeholder {
+    color: #6f767e;
+  }
+  .field-input:focus {
+    border-color: var(--color-brand-green);
+    box-shadow: 0 0 0 3px rgba(182, 255, 0, 0.16);
+    outline: none;
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--color-error-red);
+  }
+  textarea.field-input {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  /* Selectable pill/tile - dates, time slots, filters. The selected state
+     follows aria-pressed / aria-checked, so it's always announced too. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-line-strong);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-white);
+    transition:
+      background-color var(--duration-fast) ease,
+      border-color var(--duration-fast) ease,
+      color var(--duration-fast) ease;
+  }
+  .chip:hover:not(:disabled) {
+    border-color: rgba(182, 255, 0, 0.6);
+  }
+  .chip:is([aria-pressed="true"], [aria-checked="true"], [aria-current="true"]) {
+    background: var(--color-brand-green);
+    border-color: var(--color-brand-green);
+    color: var(--color-bg-dark);
+  }
+  .chip:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  /* Loading placeholder. */
+  .skeleton {
+    border-radius: var(--radius-md);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+    background-size: 200% 100%;
+    animation: gts-shimmer 1.4s ease-in-out infinite;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    border-radius: var(--radius-pill);
+    background: var(--color-brand-green);
+    padding: 0.6rem 1.1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-bg-dark);
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+}
+
+@keyframes gts-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Gentle entrance for above-the-fold content - CSS only, so it needs no
+   JavaScript and never delays the first paint of the text. */
+/* Starts just above opacity 0: Chrome never counts content first painted at
+   opacity 0 as the Largest Contentful Paint, so a hero that faded in from 0
+   left LCP to the small navbar logo. 0.1 looks the same to the eye. */
+@keyframes gts-rise {
+  from {
+    opacity: 0.1;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: gts-rise 600ms var(--ease-showroom) both;
 }
 
 /* -------------------------------------------------------------------------
@@ -276,5 +708,6 @@ h4 {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

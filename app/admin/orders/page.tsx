@@ -5,6 +5,7 @@ import Image from "next/image";
 import { X } from "lucide-react";
 import { apiFetch, apiFetchBlobUrl, ApiError } from "@/lib/api";
 import type { AdminOrder, AdminOrderFile, ApiListResponse } from "@/lib/admin-types";
+import { formatMoney } from "@/lib/money";
 
 const STATUS_STYLES: Record<AdminOrder["status"], string> = {
   pending: "text-yellow-400 border-yellow-400/40 bg-yellow-400/10",
@@ -155,16 +156,14 @@ export default function AdminOrdersPage() {
               <div>
                 <p className="text-xs text-[var(--color-text-gray)]">Total</p>
                 <p className="font-bold text-white">
-                  {order.priceBreakdown.currency}
-                  {order.priceBreakdown.total}
+                  {formatMoney(order.priceBreakdown.currency, order.priceBreakdown.total)}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-[var(--color-text-gray)]">Advance / Balance</p>
                 <p className="text-white">
-                  {order.priceBreakdown.currency}
-                  {order.advanceAmount} / {order.priceBreakdown.currency}
-                  {order.balanceAmount}
+                  {formatMoney(order.priceBreakdown.currency, order.advanceAmount)} /{" "}
+                  {formatMoney(order.priceBreakdown.currency, order.balanceAmount)}
                 </p>
               </div>
               <div>

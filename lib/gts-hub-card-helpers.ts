@@ -78,7 +78,7 @@ export const HUB_BASE_PATH: Record<ContentType, string> = {
 }
 
 export const HUB_TYPE_LABEL: Record<ContentType, string> = {
-  portfolio: "Portfolio",
+  portfolio: "Project",
   journal: "Journal",
   "new-arrival": "New Arrival",
   material: "Material",

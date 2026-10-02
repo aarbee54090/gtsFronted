@@ -1,47 +1,51 @@
-import { render, screen, waitFor } from "@testing-library/react"
-import { describe, it, expect, vi } from "vitest"
+import { act, render, screen } from "@testing-library/react"
+import { describe, it, expect } from "vitest"
 import { ProductCategories } from "@/components/landing/ProductCategories"
-import { fetchMainProducts } from "@/lib/api"
+import type { ProductCard } from "@/lib/catalog"
 
-// Only fetchMainProducts is stubbed - importActual keeps every other export
-// (apiFetch, getAdminKey, etc.) real, since @/lib/api is now the single
-// shared module for every backend call, not just this component's.
-vi.mock("@/lib/api", async (importActual) => ({
-  ...(await importActual<typeof import("@/lib/api")>()),
-  fetchMainProducts: vi.fn(() =>
-    Promise.resolve([
-      { _id: "1", name: "Jersey Kit", thumbnailImageUrl: undefined, description: undefined },
-      { _id: "2", name: "Tracksuit", thumbnailImageUrl: undefined, description: undefined },
-      { _id: "3", name: "hoodie", thumbnailImageUrl: undefined, description: undefined },
-    ])
-  ),
-}))
+// The page resolves each main product to its category on the server
+// (lib/catalog.ts) and hands the promise down. React 19 needs the render
+// awaited inside act() for a component that suspends on that promise.
+const PRODUCT_CARDS: ProductCard[] = [
+  { _id: "1", name: "Jersey Kit", category: "Jersey Kit", href: "/customize/Jersey%20Kit" },
+  { _id: "2", name: "Tracksuit", category: "Tracksuit", href: "/customize/Tracksuit" },
+  { _id: "3", name: "Hoodie Custom Designed", category: "Hoodie", href: "/customize/Hoodie" },
+]
+
+async function renderWith(productCards: ProductCard[]) {
+  await act(async () => {
+    render(<ProductCategories productCards={Promise.resolve(productCards)} />)
+  })
+}
 
 describe("ProductCategories", () => {
-  it("renders a card for every real main product returned by the backend", async () => {
-    render(<ProductCategories />)
-    await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Jersey Kit" })).toBeInTheDocument()
-      expect(screen.getByRole("heading", { name: "Tracksuit" })).toBeInTheDocument()
-      expect(screen.getByRole("heading", { name: "hoodie" })).toBeInTheDocument()
-    })
+  it("renders a card for every resolved main product", async () => {
+    await renderWith(PRODUCT_CARDS)
+    expect(screen.getByRole("heading", { name: "Jersey Kit" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Tracksuit" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Hoodie Custom Designed" })).toBeInTheDocument()
   })
 
-  it("links each card using the literal main product name, URL-encoded - no hardcoded slug guessing", async () => {
-    render(<ProductCategories />)
-    await waitFor(() => {
-      const link = screen.getByRole("link", { name: /jersey kit/i })
+  it("links each card to the category it resolved to, not its display name", async () => {
+    await renderWith(PRODUCT_CARDS)
+    // One link per layout (mobile list + desktop grid) - both must match.
+    const hoodieLinks = screen.getAllByRole("link", { name: /hoodie custom designed/i })
+    expect(hoodieLinks.length).toBeGreaterThan(0)
+    for (const link of hoodieLinks) expect(link).toHaveAttribute("href", "/customize/Hoodie")
+    for (const link of screen.getAllByRole("link", { name: /jersey kit/i })) {
       expect(link).toHaveAttribute("href", "/customize/Jersey%20Kit")
-    })
+    }
   })
 
-  it("renders the section heading immediately, before data loads", async () => {
-    render(<ProductCategories />)
+  it("renders the page h1 immediately, before data loads", () => {
+    render(<ProductCategories productCards={new Promise<ProductCard[]>(() => {})} />)
     expect(
-      screen.getByRole("heading", { name: /built for every team, every sport/i })
+      screen.getByRole("heading", { level: 1, name: /built for every team, every sport/i })
     ).toBeInTheDocument()
-    // Let the pending fetchMainProducts() promise resolve before the test ends,
-    // so its state update doesn't leak into the next test as an act() warning.
-    await waitFor(() => expect(vi.mocked(fetchMainProducts)).toHaveBeenCalled())
+  })
+
+  it("shows the empty state when there are no products", async () => {
+    await renderWith([])
+    expect(screen.getByText(/no products available yet/i)).toBeInTheDocument()
   })
 })

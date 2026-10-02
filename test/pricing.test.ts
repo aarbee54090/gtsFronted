@@ -46,7 +46,7 @@ describe("computeQuote", () => {
       {
         product,
         quantity: 1,
-        addons: [{ addonId: "shorts", styleId: "shorts-normal", quantity: 1 }], // ₹220
+        addons: [{ addonId: "shorts", styleId: "shorts-normal", quantity: 1 }], // Rs 220
         deadlineDate: null,
         couponCode: null,
       },
@@ -56,7 +56,7 @@ describe("computeQuote", () => {
       {
         product,
         quantity: 1,
-        addons: [{ addonId: "shorts", styleId: "shorts-full-design", quantity: 1 }], // ₹700
+        addons: [{ addonId: "shorts", styleId: "shorts-full-design", quantity: 1 }], // Rs 700
         deadlineDate: null,
         couponCode: null,
       },
@@ -272,7 +272,7 @@ describe("computeQuote - variant surcharge", () => {
     const result = computeQuote(
       {
         product,
-        variantSurcharge: 240, // e.g. 2 x Full Sleeve @ ₹120
+        variantSurcharge: 240, // e.g. 2 x Full Sleeve @ Rs 120
         quantity: 2,
         addons: [],
         deadlineDate: null,

@@ -88,6 +88,10 @@ export function AddonForm({ initialData }: AddonFormProps) {
           placeholder="e.g. Shorts"
           className={inputClasses}
         />
+        <p className="text-xs text-[var(--color-text-gray)]">
+          Customers see every addon with the same name as one group. Add each variant (number print, stripes...) as a
+          style below.
+        </p>
       </div>
 
       <AddonStyleListEditor

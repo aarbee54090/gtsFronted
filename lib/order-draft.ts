@@ -4,6 +4,8 @@ import type { PlayerRow } from "./types"
 const ORDER_DRAFT_KEY = "gts_order_draft"
 
 export interface OrderDraft {
+  /** The catalog product's id - the backend records the order against it. Missing on drafts saved before it existed. */
+  productId?: string
   productName: string
   designName: string
   designImageUrl?: string

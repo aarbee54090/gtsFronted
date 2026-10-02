@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Card } from "@/components/customize/Card"
 import { RequireCustomer } from "@/components/account/RequireCustomer"
 import { AccountNav } from "@/components/account/AccountNav"
@@ -108,16 +106,14 @@ function SettingsForm() {
 
 export default function AccountSettingsPage() {
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <>
       <div className="mx-auto max-w-[640px] px-6 pb-24 pt-32">
-        <h1 className="mb-6 text-3xl font-bold text-white">Account Settings</h1>
+        <h1 className="display-lg mb-6">Account Settings</h1>
         <RequireCustomer>
           <AccountNav />
           <SettingsForm />
         </RequireCustomer>
       </div>
-    </div>
+    </>
   )
 }

@@ -7,6 +7,13 @@ export interface ContactInfo {
   address?: string
   whatsapp?: string
   mapEmbedUrl?: string
+  // Optional structured address + visit details (see backend ContactInfo.js).
+  streetAddress?: string
+  addressLocality?: string
+  addressRegion?: string
+  postalCode?: string
+  mapsUrl?: string
+  openingHours?: string
   seo?: SeoFields
 }
 

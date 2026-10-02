@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Tag, X } from "lucide-react"
 
 import type { Design, PricingTier } from "@/lib/types"
+import { formatMoney } from "@/lib/money"
 
 interface ViewPricingButtonProps {
   designs: Design[]
@@ -66,8 +67,7 @@ export function ViewPricingButton({ designs, pricingTiers, currency }: ViewPrici
                   >
                     <span className="text-sm text-white">{tierLabel(tier)}</span>
                     <span className="text-sm font-bold text-[var(--color-brand-green)]">
-                      {currency}
-                      {tier.price} / pc
+                      {formatMoney(currency, tier.price)} / pc
                     </span>
                   </div>
                 ))}
@@ -97,8 +97,7 @@ export function ViewPricingButton({ designs, pricingTiers, currency }: ViewPrici
                       <span className="text-sm font-medium text-white">{design.name}</span>
                     </div>
                     <span className="text-sm font-bold text-[var(--color-brand-green)]">
-                      {currency}
-                      {design.price ?? 0}
+                      {formatMoney(currency, design.price ?? 0)}
                     </span>
                   </div>
                 ))}

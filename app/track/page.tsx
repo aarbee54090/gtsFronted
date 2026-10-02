@@ -2,10 +2,9 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Card } from "@/components/customize/Card"
 import { ApiError, trackOrder, type OrderTracking } from "@/lib/api"
+import { formatMoney } from "@/lib/money"
 
 const inputClasses =
   "w-full rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/20 px-4 py-3 text-sm uppercase text-white placeholder:normal-case placeholder:text-gray-600 focus:border-[var(--color-brand-green)] focus:outline-none"
@@ -20,10 +19,6 @@ const STATUS_MESSAGES: Record<OrderTracking["status"], string> = {
   pending: "We've received your order and payment receipt. Our team is reviewing it.",
   approved: "Your order has been approved and is being made.",
   rejected: "Your order couldn't be approved. Please contact us for details.",
-}
-
-function formatMoney(currency: string, amount: number) {
-  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
 }
 
 function formatDate(iso: string) {
@@ -57,11 +52,9 @@ export default function TrackOrderPage() {
   }
 
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <>
       <div className="mx-auto max-w-[640px] px-6 pb-24 pt-32">
-        <h1 className="mb-2 text-3xl font-bold text-white">Track Your Order</h1>
+        <h1 className="display-lg mb-2">Track Your Order</h1>
         <p className="mb-6 text-sm text-[var(--color-text-gray)]">
           Enter the order ID you received after confirming your order (it looks like GTS-XXXXXXXX).
         </p>
@@ -155,6 +148,6 @@ export default function TrackOrderPage() {
           </Card>
         )}
       </div>
-    </div>
+    </>
   )
 }

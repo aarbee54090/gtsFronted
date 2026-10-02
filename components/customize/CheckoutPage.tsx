@@ -11,10 +11,7 @@ import { apiFetch, ApiError } from "@/lib/api"
 import type { ApiItemResponse, PaymentConfig, PaymentMethod } from "@/lib/admin-types"
 import { useCustomerAuth } from "@/components/account/CustomerAuthContext"
 import { Card } from "./Card"
-
-function formatMoney(currency: string, amount: number) {
-  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-}
+import { formatMoney } from "@/lib/money"
 
 const inputClasses =
   "rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/20 px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-[var(--color-brand-green)] focus:outline-none"
@@ -89,6 +86,9 @@ export function CheckoutPage() {
 
     try {
       const formData = new FormData()
+      // The backend records the product (and checks the quantity against its
+      // price tiers) from this id; productName is kept for older drafts.
+      if (draft.productId) formData.set("productId", draft.productId)
       formData.set("productName", draft.productName)
       formData.set("category", draft.categoryId)
       formData.set("sport", draft.sportSlug)
@@ -185,6 +185,29 @@ export function CheckoutPage() {
     )
   }
 
+  // A draft saved before unpriced quantities were blocked can still hold a
+  // Rs 0 total - it can't be paid for, so send it to a custom quote instead.
+  if (!(draft.quote.total > 0)) {
+    return (
+      <Card className="flex flex-col items-center gap-4 p-8 text-center">
+        <h1 className="text-xl font-bold text-white">This order needs a custom quote</h1>
+        <p className="text-sm text-[var(--color-text-gray)]">
+          There&apos;s no set price for this quantity, so it can&apos;t be ordered online. Contact us and we&apos;ll
+          quote it for you, or change the quantity.
+        </p>
+        <Link
+          href={`/customize/${draft.categoryId}/${draft.sportSlug}`}
+          className="rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-6 py-3 text-sm font-bold text-[var(--color-bg-dark)]"
+        >
+          Back to customizing
+        </Link>
+        <Link href="/gts-hub/contact" className="text-sm font-medium text-[var(--color-text-gray)] hover:text-white">
+          Contact us
+        </Link>
+      </Card>
+    )
+  }
+
   const advanceAmount = Math.round(draft.quote.total * 0.4)
   const remainingAmount = draft.quote.total - advanceAmount
   const canConfirm = Boolean(
@@ -200,7 +223,7 @@ export function CheckoutPage() {
         >
           ← Back to customize
         </Link>
-        <h1 className="text-2xl font-bold text-white">Confirm &amp; Pay</h1>
+        <h1 className="display-md">Confirm &amp; Pay</h1>
       </div>
 
       <Card className="flex flex-col gap-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { unpricedQuantities, validatePricingTiers } from "@/lib/pricing";
 
 interface DesignRow {
   name: string;
@@ -110,9 +111,23 @@ export function ProductForm({
     setPricingTiers((prev) => prev.filter((_, i) => i !== index));
   }
 
+  const tiersToSave = pricingTiers
+    .filter((t) => t.minQty && t.price)
+    .map((t) => ({
+      minQty: Number(t.minQty),
+      maxQty: t.maxQty ? Number(t.maxQty) : null,
+      price: Number(t.price),
+    }));
+  const tierError = validatePricingTiers(tiersToSave);
+  const tierGaps = tierError ? [] : unpricedQuantities(tiersToSave);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (tierError) {
+      setError(tierError);
+      return;
+    }
     setSubmitting(true);
 
     try {
@@ -129,13 +144,7 @@ export function ProductForm({
             imageUrl: d.imageUrl,
             price: Number(d.price) || 0,
           })),
-        pricingTiers: pricingTiers
-          .filter((t) => t.minQty && t.price)
-          .map((t) => ({
-            minQty: Number(t.minQty),
-            maxQty: t.maxQty ? Number(t.maxQty) : null,
-            price: Number(t.price),
-          })),
+        pricingTiers: tiersToSave,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -315,6 +324,14 @@ export function ProductForm({
             </button>
           </div>
         ))}
+
+        {tierError && <p className="text-xs font-semibold text-[var(--color-error-red)]">{tierError}</p>}
+        {tierGaps.length > 0 && (
+          <p className="text-xs text-amber-300">
+            No price set for: {tierGaps.join(", ")} pcs. Customers ordering these quantities are asked to contact you for
+            a custom quote instead of ordering online.
+          </p>
+        )}
       </div>
 
       {error && (

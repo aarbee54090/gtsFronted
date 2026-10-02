@@ -10,16 +10,21 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-[var(--color-brand-green)] text-[var(--color-bg-dark)] shadow-[0_0_32px_rgba(182,255,0,0.35)] hover:bg-[var(--color-green-hover)] hover:shadow-[0_0_48px_rgba(182,255,0,0.55)] hover:-translate-y-0.5 active:translate-y-0",
+          "bg-[var(--color-brand-green)] text-[var(--color-bg-dark)] shadow-[var(--glow-green)] hover:bg-[var(--color-green-hover)] hover:shadow-[var(--glow-green-strong)] hover:-translate-y-0.5 active:translate-y-0",
+        // Solid neutral - the second action next to a primary one.
+        secondary:
+          "bg-white/[0.07] text-[var(--color-text-white)] border border-[var(--color-line-strong)] hover:bg-white/[0.12] hover:border-white/30",
         outline:
-          "bg-transparent text-[var(--color-text-white)] border border-[var(--glass-border)] hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]",
+          "bg-transparent text-[var(--color-text-white)] border border-[var(--color-line-strong)] hover:border-[var(--color-brand-green)] hover:text-[var(--color-brand-green)]",
         ghost: "bg-transparent hover:bg-[var(--color-card-dark)]",
+        // WhatsApp's own green, so the channel is recognisable at a glance.
+        whatsapp: "bg-[#25D366] text-[#06210f] hover:bg-[#3ee07a]",
       },
       size: {
         default: "h-11 px-6 py-2",
-        sm: "h-9 px-4 text-xs",
-        lg: "h-12 px-8 text-base",
-        icon: "h-10 w-10",
+        sm: "h-10 px-4 text-sm",
+        lg: "h-12 px-7 text-base",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {

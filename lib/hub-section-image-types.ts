@@ -17,7 +17,7 @@ export const HUB_SECTION_KEYS: HubSectionKey[] = [
 ]
 
 export const HUB_SECTION_LABELS: Record<HubSectionKey, string> = {
-  portfolio: "Portfolio",
+  portfolio: "Our Work",
   "new-arrivals": "New Arrivals",
   materials: "Materials",
   journal: "Journal",

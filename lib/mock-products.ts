@@ -1,4 +1,5 @@
 import type { ProductDetail } from "./types"
+import { CURRENCY } from "./money"
 
 // Mock data standing in for `GET /products/:id`. Shape mirrors the real
 // Product schema (configFields, fabricOptions, qualityTiers, designs, addons)
@@ -118,7 +119,7 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
       {
         id: "track",
         name: "Track",
-        // Only "Normal" price (₹500) was given so far - other tiers below
+        // Only "Normal" price (Rs 500) was given so far - other tiers below
         // are placeholders scaled from Shorts' pricing ratio, pending real
         // numbers (editable later via the admin panel's Addon CRUD).
         styles: [
@@ -132,12 +133,8 @@ export const MOCK_PRODUCTS: Record<string, ProductDetail> = {
     ],
     pricingTiers: [],
     quantityDiscount: { type: "quantity_tier", minQuantity: 50, percentOff: 5 },
-    currency: "₹",
+    currency: CURRENCY,
   },
-}
-
-export function getProductByCategory(categoryId: string): ProductDetail | null {
-  return MOCK_PRODUCTS[categoryId] ?? null
 }
 
 export function sportToSlug(sport: string): string {

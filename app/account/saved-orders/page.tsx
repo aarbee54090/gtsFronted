@@ -3,18 +3,13 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Card } from "@/components/customize/Card"
 import { RequireCustomer } from "@/components/account/RequireCustomer"
 import { AccountNav } from "@/components/account/AccountNav"
 import { apiFetch } from "@/lib/api"
 import { saveOrderDraft } from "@/lib/order-draft"
 import type { SavedOrder } from "@/lib/saved-order-types"
-
-function formatMoney(currency: string, amount: number) {
-  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-}
+import { formatMoney } from "@/lib/money"
 
 function SavedOrdersList() {
   const router = useRouter()
@@ -118,16 +113,14 @@ function SavedOrdersList() {
 
 export default function SavedOrdersPage() {
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <>
       <div className="mx-auto max-w-[640px] px-6 pb-24 pt-32">
-        <h1 className="mb-6 text-3xl font-bold text-white">Saved Orders</h1>
+        <h1 className="display-lg mb-6">Saved Orders</h1>
         <RequireCustomer>
           <AccountNav />
           <SavedOrdersList />
         </RequireCustomer>
       </div>
-    </div>
+    </>
   )
 }

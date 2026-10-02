@@ -5,29 +5,41 @@ import { motion } from "motion/react"
 import { CardPhoto } from "@/components/shared/CardPhoto"
 
 import { sportToSlug } from "@/lib/mock-products"
+import { sportLabel } from "@/lib/sports"
 import type { BackendProductSummary } from "@/lib/api"
 
 interface SportPickerProps {
   categorySlug: string
-  categoryName: string
   sports: BackendProductSummary[]
+  /** Page h1, e.g. "Custom Team Jerseys" - its last word is highlighted. */
+  heading: string
+  /** Line above the h1, e.g. "Jersey printing · Kathmandu, Nepal". */
+  eyebrow: string
+  /** Instruction under the h1, e.g. "Choose your sport to see its designs." */
+  prompt: string
 }
 
-export function SportPicker({ categorySlug, categoryName, sports }: SportPickerProps) {
+export function SportPicker({ categorySlug, sports, heading, eyebrow, prompt }: SportPickerProps) {
+  const split = heading.lastIndexOf(" ")
   return (
     <div>
       <div className="mb-8 flex gap-4">
         <span aria-hidden="true" className="mt-1 w-[3px] shrink-0 self-stretch rounded-full bg-[var(--color-brand-green)]" />
         <div>
           <p className="mb-1 text-xs font-bold uppercase tracking-[0.1em] text-[var(--color-brand-green)]">
-            {categoryName}
+            {eyebrow}
           </p>
-          <h1 className="mb-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Choose your <span className="text-[var(--color-brand-green)]">sport</span>
+          <h1 className="display-lg mb-2">
+            {split > 0 ? (
+              <>
+                {heading.slice(0, split)}{" "}
+                <span className="text-[var(--color-brand-green)]">{heading.slice(split + 1)}</span>
+              </>
+            ) : (
+              heading
+            )}
           </h1>
-          <p className="text-sm text-[var(--color-text-gray)]">
-            Designs are tailored to each sport — pick one to see the right kits.
-          </p>
+          <p className="text-sm text-[var(--color-text-gray)]">{prompt}</p>
         </div>
       </div>
 
@@ -59,7 +71,7 @@ export function SportPicker({ categorySlug, categoryName, sports }: SportPickerP
                 >
                   <div className="flex w-[42%] flex-shrink-0 flex-col justify-between p-4">
                     <div>
-                      <p className="text-base font-bold text-white">{item.sport}</p>
+                      <p className="text-base font-bold text-white">{sportLabel(item.sport)}</p>
                       <p className="text-xs text-[var(--color-text-gray)]">{item.name}</p>
                     </div>
                     <span
@@ -107,7 +119,7 @@ export function SportPicker({ categorySlug, categoryName, sports }: SportPickerP
                   <div className="flex w-[28%] flex-shrink-0 flex-col justify-between p-5 xl:w-[18%]">
                     <div>
                       <p className="text-base font-bold text-white">{item.name}</p>
-                      <p className="text-xs text-[var(--color-text-gray)]">{item.sport}</p>
+                      <p className="text-xs text-[var(--color-text-gray)]">{sportLabel(item.sport)}</p>
                     </div>
                     <span
                       aria-hidden="true"
@@ -145,7 +157,7 @@ export function SportPicker({ categorySlug, categoryName, sports }: SportPickerP
                 <div className="glass-bevel relative mx-3 mb-3 flex min-h-[76px] items-center gap-3 rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/30 p-3 backdrop-blur-[20px]">
                   <div className="flex flex-1 flex-col gap-0.5">
                     <span className="line-clamp-2 text-base font-bold leading-tight text-white">{item.name}</span>
-                    <span className="text-xs text-[var(--color-text-gray)]">{item.sport}</span>
+                    <span className="text-xs text-[var(--color-text-gray)]">{sportLabel(item.sport)}</span>
                   </div>
                   <span
                     aria-hidden="true"

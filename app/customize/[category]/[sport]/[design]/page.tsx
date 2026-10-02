@@ -1,45 +1,55 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 
-import { Navbar } from "@/components/landing/Navbar"
 import { Customizer } from "@/components/customize/Customizer"
-import { MOCK_PRODUCTS } from "@/lib/mock-products"
+import { MOCK_PRODUCTS, sportToSlug } from "@/lib/mock-products"
 import { fetchProductByCategorySport, fetchAddons } from "@/lib/api"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
+import { decodeRouteParam } from "@/lib/route-params"
+import { brandTitle, pageMetadata } from "@/lib/seo"
 
 interface DesignPageProps {
   params: Promise<{ category: string; sport: string; design: string }>
 }
 
+// One URL per design per visitor - a configurator step, not a landing page,
+// so it stays out of the index (links are still followed).
 export async function generateMetadata({ params }: DesignPageProps): Promise<Metadata> {
-  const { category: rawCategory, sport: sportSlug } = await params
-  const category = decodeURIComponent(rawCategory)
-  const realProduct = await fetchProductByCategorySport(category, sportSlug)
+  const { category: rawCategory, sport: rawSport } = await params
+  const category = decodeRouteParam(rawCategory)
+  const sport = decodeRouteParam(rawSport)
+  if (category === null || sport === null) notFound()
+  const realProduct = await fetchProductByCategorySport(category, sport)
 
   if (!realProduct) {
-    return { title: `Custom ${category} | GTS`, description: `Design a custom ${category} with GTS.` }
+    return pageMetadata({
+      title: brandTitle(`Custom ${category}`),
+      description: `Design a custom ${category} with GoalThali Sports.`,
+      noindex: true,
+    })
   }
 
-  return {
-    title: `Customize Your ${realProduct.sport} ${realProduct.category} | GTS`,
-    description: `Set fabric, fit, addons, and quantity for your ${realProduct.sport.toLowerCase()} ${realProduct.category.toLowerCase()} and get instant pricing from GTS.`,
-    robots: { index: false, follow: true },
-  }
+  return pageMetadata({
+    title: brandTitle(`Customize ${realProduct.name}`),
+    description: `Set fabric, fit, addons, and quantity for your ${realProduct.name} and get instant pricing from GoalThali Sports.`,
+    noindex: true,
+  })
 }
 
 export default async function DesignPage({ params }: DesignPageProps) {
-  const { category: rawCategory, sport: sportSlug, design: designId } = await params
-  const category = decodeURIComponent(rawCategory) // Next.js does NOT auto-decode this
+  const { category: rawCategory, sport: rawSport, design: rawDesign } = await params
+  const category = decodeRouteParam(rawCategory) // Next.js does NOT auto-decode this
+  const sport = decodeRouteParam(rawSport)
+  const designId = decodeRouteParam(rawDesign)
+  if (category === null || sport === null || designId === null) notFound()
   const [realProduct, realAddons] = await Promise.all([
-    fetchProductByCategorySport(category, sportSlug),
+    fetchProductByCategorySport(category, sport),
     fetchAddons(),
   ])
 
   if (!realProduct) {
     return (
-      <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
-        <AmbientBackground />
-        <Navbar />
+      <>
         <div className="mx-auto max-w-[1100px] px-6 pb-24 pt-32">
           <div className="flex flex-col items-center gap-4 py-24 text-center">
             <h1 className="text-2xl font-bold">Product not found</h1>
@@ -54,7 +64,7 @@ export default async function DesignPage({ params }: DesignPageProps) {
             </Link>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
@@ -73,6 +83,11 @@ export default async function DesignPage({ params }: DesignPageProps) {
   // substituted in (same approach as the design-gallery page).
   const productForCustomizer = {
     ...MOCK_PRODUCTS["jersey-kit"],
+    // The real product's identity - the template's own name ("Football
+    // Jersey Kit") used to end up on every order, whatever was customized.
+    id: realProduct._id,
+    name: realProduct.name,
+    category: realProduct.category,
     designs: realProduct.designs.map((d) => ({
       id: d._id ?? d.name,
       name: d.name,
@@ -91,11 +106,12 @@ export default async function DesignPage({ params }: DesignPageProps) {
     addons: realAddons.length > 0 ? realAddons : MOCK_PRODUCTS["jersey-kit"].addons,
   }
 
-  return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-white">
-      <AmbientBackground />
-      <Navbar />
+  // The product's own slug rather than the URL variant - used for the back
+  // link and carried into the quotation, checkout, and order record.
+  const sportSlug = sportToSlug(realProduct.sport)
 
+  return (
+    <>
       <div className="mx-auto max-w-[1100px] px-6 pb-24 pt-32">
         <div className="mb-8">
           <Link
@@ -107,7 +123,7 @@ export default async function DesignPage({ params }: DesignPageProps) {
           <p className="mb-1 text-xs font-bold uppercase tracking-[0.1em] text-[var(--color-brand-green)]">
             {realProduct.sport} {realProduct.category}
           </p>
-          <h1 className="text-3xl font-extrabold sm:text-4xl">{realProduct.name}</h1>
+          <h1 className="display-lg">{realProduct.name}</h1>
         </div>
         <Customizer
           product={productForCustomizer}
@@ -116,6 +132,6 @@ export default async function DesignPage({ params }: DesignPageProps) {
           sportSlug={sportSlug}
         />
       </div>
-    </div>
+    </>
   )
 }

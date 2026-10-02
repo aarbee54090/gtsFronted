@@ -10,19 +10,19 @@ const mockSports: BackendProductSummary[] = [
 
 describe("SportPicker", () => {
   it("renders a card for every sport variant passed in", () => {
-    render(<SportPicker categorySlug="jersey-kit" categoryName="Jersey Kit" sports={mockSports} />)
+    render(<SportPicker categorySlug="jersey-kit" heading="Custom Team Jerseys" eyebrow="Jersey printing · Kathmandu, Nepal" prompt="Choose your sport to see its designs." sports={mockSports} />)
     expect(screen.getByText("Football Jersey Kit")).toBeInTheDocument()
     expect(screen.getByText("Volleyball Jersey Kit")).toBeInTheDocument()
   })
 
   it("links each sport to the customize flow with category and sport slugs", () => {
-    render(<SportPicker categorySlug="jersey-kit" categoryName="Jersey Kit" sports={mockSports} />)
+    render(<SportPicker categorySlug="jersey-kit" heading="Custom Team Jerseys" eyebrow="Jersey printing · Kathmandu, Nepal" prompt="Choose your sport to see its designs." sports={mockSports} />)
     const footballLink = screen.getByRole("link", { name: /football jersey kit/i })
     expect(footballLink).toHaveAttribute("href", "/customize/jersey-kit/football")
   })
 
   it("shows an empty state when no sports exist for the category", () => {
-    render(<SportPicker categorySlug="jersey-kit" categoryName="Jersey Kit" sports={[]} />)
+    render(<SportPicker categorySlug="jersey-kit" heading="Custom Team Jerseys" eyebrow="Jersey printing · Kathmandu, Nepal" prompt="Choose your sport to see its designs." sports={[]} />)
     expect(screen.getByText(/no sports available yet/i)).toBeInTheDocument()
   })
 })

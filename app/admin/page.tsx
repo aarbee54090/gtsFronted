@@ -26,7 +26,11 @@ const GROUPS: DashboardGroup[] = [
     title: "GTS Hub Content",
     links: [
       { href: "/admin/hub-images", title: "Hub Card Images", description: "Background image for each GTS Hub landing card" },
-      { href: "/admin/portfolio", title: "Portfolio", description: "Real GTS work - completed projects" },
+      {
+        href: "/admin/portfolio",
+        title: "Our Work",
+        description: "Completed projects shown under Our Work and on the homepage",
+      },
       { href: "/admin/journal", title: "Journal", description: "Guides and behind-the-scenes articles" },
       { href: "/admin/new-arrivals", title: "New Arrivals", description: "Latest designs and collections" },
       { href: "/admin/materials", title: "Materials", description: "Fabrics and materials used in GTS products" },
@@ -34,11 +38,19 @@ const GROUPS: DashboardGroup[] = [
     ],
   },
   {
-    title: "Site Pages",
+    title: "Customers",
     links: [
-      { href: "/admin/about", title: "About Us", description: "Edit the About Us page content" },
+      {
+        href: "/admin/appointments",
+        title: "Appointments",
+        description: "Visit requests, and the dates and times customers can book",
+      },
       { href: "/admin/contact", title: "Contact Us", description: "Edit contact info and view submitted messages" },
     ],
+  },
+  {
+    title: "Site Pages",
+    links: [{ href: "/admin/about", title: "About Us", description: "Edit the About Us page content" }],
   },
 ];
 

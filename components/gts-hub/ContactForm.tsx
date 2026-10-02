@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { ApiError, submitContactMessage } from "@/lib/api"
+import { Button } from "@/components/ui/button"
 
-const inputClasses = "glass-1 w-full rounded-[var(--radius-md)] px-3 py-2 text-sm text-white placeholder:text-gray-500"
+const LIMITS = { name: 100, email: 200, message: 5000 }
 
 export function ContactForm() {
   const [name, setName] = useState("")
@@ -18,7 +19,11 @@ export function ContactForm() {
     setError(null)
 
     if (!name.trim() || !email.trim() || !message.trim()) {
-      setError("All fields are required.")
+      setError("Please fill in your name, email, and message.")
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Please enter a valid email address.")
       return
     }
 
@@ -30,7 +35,7 @@ export function ContactForm() {
       setEmail("")
       setMessage("")
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to send message.")
+      setError(err instanceof ApiError ? err.message : "Failed to send message. Please try again.")
     } finally {
       setSubmitting(false)
     }
@@ -38,41 +43,67 @@ export function ContactForm() {
 
   if (submitted) {
     return (
-      <p className="rounded-[var(--radius-lg)] border border-[var(--color-brand-green)]/40 bg-[var(--color-brand-green)]/10 px-5 py-4 text-sm text-[var(--color-brand-green)]">
-        Thanks — your message has been sent. We&apos;ll get back to you soon.
+      <p role="status" className="notice notice-success">
+        Thanks - your message has been sent. We&apos;ll reply to the email address you gave.
       </p>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div>
-        <label className="mb-1 block text-xs text-[var(--color-text-gray)]">Name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} className={inputClasses} />
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+      <div className="field">
+        <label htmlFor="contact-name" className="field-label">
+          Name
+        </label>
+        <input
+          id="contact-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
+          maxLength={LIMITS.name}
+          required
+          className="field-input"
+        />
       </div>
-      <div>
-        <label className="mb-1 block text-xs text-[var(--color-text-gray)]">Email</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClasses} />
+      <div className="field">
+        <label htmlFor="contact-email" className="field-label">
+          Email
+        </label>
+        <input
+          id="contact-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          maxLength={LIMITS.email}
+          required
+          className="field-input"
+        />
       </div>
-      <div>
-        <label className="mb-1 block text-xs text-[var(--color-text-gray)]">Message</label>
+      <div className="field">
+        <label htmlFor="contact-message" className="field-label">
+          Message
+        </label>
         <textarea
+          id="contact-message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={5}
-          className={`${inputClasses} resize-none`}
+          maxLength={LIMITS.message}
+          required
+          className="field-input"
         />
       </div>
 
-      {error && <p className="text-sm text-[var(--color-error-red)]">{error}</p>}
+      {error && (
+        <p role="alert" className="field-error text-sm">
+          {error}
+        </p>
+      )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-fit rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-6 py-3 text-sm font-bold text-[var(--color-bg-dark)] disabled:opacity-40"
-      >
-        {submitting ? "Sending..." : "Send Message"}
-      </button>
+      <Button type="submit" disabled={submitting} className="w-fit">
+        {submitting ? "Sending…" : "Send Message"}
+      </Button>
     </form>
   )
 }
