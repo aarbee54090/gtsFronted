@@ -20,42 +20,42 @@ const tiers: PricingTier[] = [
 
 describe("ViewPricingButton", () => {
   it("renders the trigger button", () => {
-    render(<ViewPricingButton designs={designs} pricingTiers={[]} currency="₹" />)
+    render(<ViewPricingButton designs={designs} pricingTiers={[]} currency="Rs" />)
     expect(screen.getByRole("button", { name: /view pricing/i })).toBeInTheDocument()
   })
 
   it("does not show the pricing modal until clicked", () => {
-    render(<ViewPricingButton designs={designs} pricingTiers={[]} currency="₹" />)
+    render(<ViewPricingButton designs={designs} pricingTiers={[]} currency="Rs" />)
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
   })
 
   it("shows quantity tiers when the product has them", async () => {
     const user = userEvent.setup()
-    render(<ViewPricingButton designs={designsNoPrice} pricingTiers={tiers} currency="₹" />)
+    render(<ViewPricingButton designs={designsNoPrice} pricingTiers={tiers} currency="Rs" />)
 
     await user.click(screen.getByRole("button", { name: /view pricing/i }))
 
     expect(screen.getByText("Price by Quantity")).toBeInTheDocument()
     expect(screen.getByText("1-2 pcs")).toBeInTheDocument()
-    expect(screen.getByText("₹500 / pc")).toBeInTheDocument()
+    expect(screen.getByText("Rs 500 / pc")).toBeInTheDocument()
     expect(screen.getByText("3+ pcs")).toBeInTheDocument()
-    expect(screen.getByText("₹450 / pc")).toBeInTheDocument()
+    expect(screen.getByText("Rs 450 / pc")).toBeInTheDocument()
   })
 
   it("shows per-design prices when any design has one", async () => {
     const user = userEvent.setup()
-    render(<ViewPricingButton designs={designs} pricingTiers={[]} currency="₹" />)
+    render(<ViewPricingButton designs={designs} pricingTiers={[]} currency="Rs" />)
 
     await user.click(screen.getByRole("button", { name: /view pricing/i }))
 
     expect(screen.getByText("Price by Design")).toBeInTheDocument()
     expect(screen.getByText("Design One")).toBeInTheDocument()
-    expect(screen.getByText("₹450")).toBeInTheDocument()
+    expect(screen.getByText("Rs 450")).toBeInTheDocument()
   })
 
   it("shows both sections together when both exist", async () => {
     const user = userEvent.setup()
-    render(<ViewPricingButton designs={designs} pricingTiers={tiers} currency="₹" />)
+    render(<ViewPricingButton designs={designs} pricingTiers={tiers} currency="Rs" />)
 
     await user.click(screen.getByRole("button", { name: /view pricing/i }))
 
@@ -65,7 +65,7 @@ describe("ViewPricingButton", () => {
 
   it("shows a helpful empty state when neither pricing type is set", async () => {
     const user = userEvent.setup()
-    render(<ViewPricingButton designs={designsNoPrice} pricingTiers={[]} currency="₹" />)
+    render(<ViewPricingButton designs={designsNoPrice} pricingTiers={[]} currency="Rs" />)
 
     await user.click(screen.getByRole("button", { name: /view pricing/i }))
 
@@ -74,7 +74,7 @@ describe("ViewPricingButton", () => {
 
   it("closes the modal when the close button is clicked", async () => {
     const user = userEvent.setup()
-    render(<ViewPricingButton designs={designs} pricingTiers={tiers} currency="₹" />)
+    render(<ViewPricingButton designs={designs} pricingTiers={tiers} currency="Rs" />)
 
     await user.click(screen.getByRole("button", { name: /view pricing/i }))
     await user.click(screen.getByRole("button", { name: /close pricing/i }))

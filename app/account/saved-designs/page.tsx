@@ -2,8 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { RequireCustomer } from "@/components/account/RequireCustomer"
 import { AccountNav } from "@/components/account/AccountNav"
 import { useSavedDesigns } from "@/components/account/SavedDesignsContext"
@@ -37,7 +35,7 @@ function SavedDesignsList() {
               ? `${HUB_BASE_PATH[item.itemType as ContentType]}/${item.slug}`
               : null
         const content = (
-          <div className="glass-surface flex flex-col overflow-hidden rounded-[var(--radius-lg)] transition-colors hover:border-[var(--color-brand-green)]">
+          <div className="glass-2 flex flex-col overflow-hidden rounded-[var(--radius-lg)] transition-colors hover:border-[var(--color-brand-green)]">
             <div className="relative aspect-[4/3] w-full bg-black/40">
               {item.imageUrl ? (
                 <Image src={item.imageUrl} alt={item.name} fill className="object-cover" unoptimized={item.imageUrl.startsWith("data:")} />
@@ -66,16 +64,14 @@ function SavedDesignsList() {
 
 export default function SavedDesignsPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <>
       <div className="mx-auto max-w-[900px] px-6 pb-24 pt-32">
-        <h1 className="mb-6 text-3xl font-bold text-white">Saved Designs</h1>
+        <h1 className="display-lg mb-6">Saved Designs</h1>
         <RequireCustomer>
           <AccountNav />
           <SavedDesignsList />
         </RequireCustomer>
       </div>
-    </div>
+    </>
   )
 }

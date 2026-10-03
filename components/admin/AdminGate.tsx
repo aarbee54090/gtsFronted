@@ -66,7 +66,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (gateState === "denied") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-dark)] px-6">
+      <div className="admin-ui flex min-h-screen items-center justify-center bg-[var(--color-bg-dark)] px-6">
         <form
           onSubmit={handleSaveKey}
           className="flex w-full max-w-sm flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--color-card-dark)]/60 p-8 backdrop-blur-[16px]"
@@ -100,8 +100,9 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // `admin-ui` keeps the dashboard's italic heading style (see globals.css).
   return (
-    <div className="min-h-screen bg-[var(--color-bg-dark)] text-white">
+    <div className="admin-ui min-h-screen bg-[var(--color-bg-dark)] text-white">
       <header className="sticky top-0 z-10 border-b border-[var(--glass-border)] bg-[var(--color-bg-dark)]/90 backdrop-blur-[16px]">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 py-4">
           <nav className="flex items-center gap-6 text-sm">

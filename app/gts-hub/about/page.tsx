@@ -1,47 +1,66 @@
 import type { Metadata } from "next"
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { HubMedia } from "@/components/gts-hub/HubMedia"
+import { ContextualCTA } from "@/components/gts-hub/ContextualCTA"
+import { PageHeader } from "@/components/site/PageHeader"
+import { SiteShell } from "@/components/site/SiteShell"
+import { JsonLd } from "@/components/seo/JsonLd"
 import { getAboutPage } from "@/lib/api"
 import { buildMetadata } from "@/lib/gts-hub-metadata"
+import { stripHtml } from "@/lib/seo"
+import { breadcrumbNode, jsonLd } from "@/lib/structured-data"
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getAboutPage()
   return buildMetadata({
     seo: page?.seo,
-    fallbackTitle: page?.heading || "About Us",
-    fallbackDescription: "Who we are and what GTS is about.",
+    // Not the CMS heading: that's a marketing line ("Custom Sportswear &
+    // Jersey Printing in Nepal") that would duplicate the homepage title.
+    fallbackTitle: "About Us",
+    fallbackDescription: stripHtml(page?.body) || "Who we are and what GoalThali Sports is about.",
+    path: "/gts-hub/about",
+    images: [page?.heroImage],
   })
 }
+
+const TRAIL = [
+  { name: "GTS Hub", path: "/gts-hub" },
+  { name: "About Us", path: "/gts-hub/about" },
+]
 
 export default async function AboutPage() {
   const page = await getAboutPage()
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <SiteShell>
+      <JsonLd data={jsonLd(breadcrumbNode(TRAIL))} />
+      <PageHeader crumbs={TRAIL.slice(0, 1)} eyebrow="About Us" title={page?.heading || "Who We Are"} />
 
-      <div className="mx-auto max-w-[720px] px-6 pb-24 pt-32">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-brand-green)]">
-          About Us
-        </p>
-        <h1 className="mb-8 text-4xl font-extrabold uppercase tracking-tight sm:text-5xl">
-          {page?.heading || "Who We Are"}
-        </h1>
-
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-[var(--gutter)] pb-20">
         {page?.heroImage?.url && (
-          <HubMedia media={page.heroImage} className="mb-10 w-full rounded-[var(--radius-lg)] object-cover" />
+          <HubMedia
+            media={page.heroImage}
+            fallbackAlt={page.heading || "GoalThali Sports"}
+            width={1200}
+            height={800}
+            preload
+            className="w-full rounded-[var(--radius-lg)] border border-[var(--color-line)] object-cover"
+          />
         )}
 
         {page?.body ? (
           // Admin-authored HTML from the Tiptap editor, not user-generated -
           // safe to render directly.
-          <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: page.body }} />
+          <div className="prose-gts" dangerouslySetInnerHTML={{ __html: page.body }} />
         ) : (
           <p className="text-base text-[var(--color-text-gray)]">This page hasn&apos;t been set up yet.</p>
         )}
+
+        <ContextualCTA
+          title="See what we make"
+          description="Browse completed projects, or start customizing a kit for your team."
+          action={{ href: "/gts-hub/portfolio", label: "See Our Work" }}
+        />
       </div>
-    </div>
+    </SiteShell>
   )
 }

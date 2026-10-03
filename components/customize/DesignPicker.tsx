@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import Image from "next/image"
 import {
   ImageOff,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react"
 
 import type { Design } from "@/lib/types"
+import { CURRENCY, formatMoney } from "@/lib/money"
 import { SaveButton } from "@/components/account/SaveButton"
 
 interface DesignPickerProps {
@@ -27,6 +29,8 @@ interface DesignPickerProps {
   /** Passed through to each design's Save button, so a saved catalog design can later link back to this exact product/sport. */
   categoryId: string
   sportSlug: string
+  /** What the designs are, for image alt text: "football jersey" -> "GTS-11 football jersey design". */
+  designNoun?: string
 }
 
 export function DesignPicker({
@@ -34,15 +38,28 @@ export function DesignPicker({
   selectedId,
   onSelect,
   onUploadFile,
-  currency = "₹",
+  currency = CURRENCY,
   pageSize = 10,
   categoryId,
   sportSlug,
+  designNoun,
 }: DesignPickerProps) {
   const fileInput = useRef<HTMLInputElement>(null)
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [page, setPage] = useState(0)
   const [lightboxDesign, setLightboxDesign] = useState<Design | null>(null)
+
+  // Escape closes the full preview, like the addon preview.
+  useEffect(() => {
+    if (!lightboxDesign) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxDesign(null)
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [lightboxDesign])
+  // Design names are catalog codes ("GTS-11"); the alt text says what they are.
+  const designAlt = (design: Design) => (designNoun ? `${design.name} ${designNoun} design` : design.name)
 
   // Derived, not stored: the object URL is a pure function of the file.
   const uploadedPreviewUrl = useMemo(
@@ -148,9 +165,12 @@ export function DesignPicker({
                 {design.imageUrl ? (
                   <Image
                     src={design.imageUrl}
-                    alt={design.name}
+                    alt={designAlt(design)}
                     width={280}
                     height={360}
+                    // Matches the 2/3/4/5-column grid so phones don't download
+                    // desktop-sized thumbnails.
+                    sizes="(min-width: 1280px) 185px, (min-width: 1024px) 235px, (min-width: 640px) 30vw, 40vw"
                     className="aspect-[3/4] w-full rounded-[var(--radius-sm)] object-cover"
                   />
                 ) : (
@@ -165,8 +185,7 @@ export function DesignPicker({
                 <span className="text-sm font-medium text-white">{design.name}</span>
                 {!!design.price && (
                   <span className="text-xs font-semibold text-[var(--color-brand-green)]">
-                    {currency}
-                    {design.price}
+                    {formatMoney(currency, design.price)}
                   </span>
                 )}
               </button>
@@ -214,47 +233,53 @@ export function DesignPicker({
         </div>
       )}
 
-      {lightboxDesign?.imageUrl && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={`${lightboxDesign.name} full preview`}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-          onClick={() => setLightboxDesign(null)}
-        >
+      {/* Portalled to <body>: the picker sits inside a Card whose
+          backdrop-filter makes it the containing block for position: fixed,
+          which trapped this overlay inside the card (off-screen on phones).
+          z-[60] keeps it above the navbar (z-50). */}
+      {lightboxDesign?.imageUrl &&
+        createPortal(
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="glass-surface-strong flex max-h-[85vh] w-full max-w-lg flex-col gap-4 rounded-[var(--radius-lg)] p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${lightboxDesign.name} full preview`}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setLightboxDesign(null)}
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white">{lightboxDesign.name}</h3>
-              <button
-                type="button"
-                onClick={() => setLightboxDesign(null)}
-                aria-label="Close preview"
-                className="text-[var(--color-text-gray)] hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <Image
-              src={lightboxDesign.imageUrl}
-              alt={lightboxDesign.name}
-              width={500}
-              height={640}
-              className="max-h-[60vh] w-full rounded-[var(--radius-md)] object-contain"
-            />
-            <a
-              href={lightboxDesign.imageUrl}
-              download={lightboxDesign.name}
-              className="flex items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] py-2.5 text-sm font-bold text-[var(--color-bg-dark)]"
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="glass-3 flex max-h-[85vh] w-full max-w-lg flex-col gap-4 rounded-[var(--radius-lg)] p-6"
             >
-              <Download className="h-4 w-4" />
-              Download
-            </a>
-          </div>
-        </div>
-      )}
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">{lightboxDesign.name}</h3>
+                <button
+                  type="button"
+                  onClick={() => setLightboxDesign(null)}
+                  aria-label="Close preview"
+                  className="text-[var(--color-text-gray)] hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <Image
+                src={lightboxDesign.imageUrl}
+                alt={designAlt(lightboxDesign)}
+                width={500}
+                height={640}
+                className="max-h-[60vh] w-full rounded-[var(--radius-md)] object-contain"
+              />
+              <a
+                href={lightboxDesign.imageUrl}
+                download={lightboxDesign.name}
+                className="flex items-center justify-center gap-2 rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] py-2.5 text-sm font-bold text-[var(--color-bg-dark)]"
+              >
+                <Download className="h-4 w-4" />
+                Download
+              </a>
+            </div>
+          </div>,
+          document.body
+        )}
     </fieldset>
   )
 }

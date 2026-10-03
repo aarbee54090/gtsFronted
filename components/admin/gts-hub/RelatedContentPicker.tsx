@@ -17,7 +17,7 @@ interface RelatedContentPickerProps {
 }
 
 const TYPE_LABELS: Record<ContentType, string> = {
-  portfolio: "Portfolio",
+  portfolio: "Our Work project",
   journal: "Journal",
   "new-arrival": "New Arrival",
   material: "Material",

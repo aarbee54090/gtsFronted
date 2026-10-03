@@ -1,270 +1,114 @@
-"use client"
-
-import type { CSSProperties } from "react"
-import Link from "next/link"
 import Image from "next/image"
-import { motion } from "motion/react"
-import {
-  PenLine,
-  Zap,
-  ShieldCheck,
-  Truck,
-  PlayCircle,
-  Shirt,
-  Dumbbell,
-  Bike,
-} from "lucide-react"
-
+import Link from "next/link"
+import { ArrowRight, CalendarDays, Check, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { whatsappLink } from "@/lib/site"
 
-// Faint floor reflection under the grounded cutouts (ball/bag) - the case
-// stays reflection-free since its edges are already faded by a radial mask,
-// and reflecting a fading oval reads as a smudge rather than a floor. Not a
-// standard React CSS property, so it's applied via a plain style object cast.
-const REFLECT_STYLE = {
-  WebkitBoxReflect: "below 6px linear-gradient(transparent, transparent 55%, rgba(255,255,255,0.14))",
-} as CSSProperties
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  show: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] as const },
-  }),
-}
-
-const FEATURES = [
-  { icon: PenLine, label: "Fully\nCustomizable" },
-  { icon: Zap, label: "Fast\nTurnaround" },
-  { icon: ShieldCheck, label: "Premium\nQuality" },
-  { icon: Truck, label: "Worldwide\nShipping" },
+// Facts about how ordering works on this site (see lib/process-steps.ts) -
+// not marketing claims.
+const FACTS = [
+  "Pick one of our designs or upload your own",
+  "See your price as you customize",
+  "Order with a 40% advance",
+  "Track your order online",
 ]
 
-const CATEGORIES = [
-  { icon: Shirt, title: "Jerseys", subtitle: "For Every Team" },
-  { icon: Shirt, title: "Tracksuits", subtitle: "Train in Style" },
-  { icon: Shirt, title: "Hoodies", subtitle: "Stay Comfortable" },
-  { icon: Bike, title: "Cycling Jersey", subtitle: "Ride in Comfort" },
-  { icon: Dumbbell, title: "Gym Wear", subtitle: "Built for Performance" },
-]
-
-const SPORTS = [
-  { icon: "/images/sport-basketball.png", label: "Basketball" },
-  { icon: "/images/sport-football.png", label: "Football" },
-  { icon: "/images/sport-volleyball.png", label: "Volleyball" },
-  { icon: "/images/sport-cricket.png", label: "Cricket" },
-  { icon: "/images/sport-cycling.png", label: "Cycling" },
-]
-
-// The case/ball/bag composition, reused for both mobile (normal flow, no
-// absolute positioning at all) and desktop (absolutely positioned within
-// the hero). Internal percentages are relative to THIS wrapper's own
-// aspect-ratio box, not the whole page - so they stay correct regardless
-// of how tall the surrounding text ends up being.
-function Scene({ variant }: { variant: "mobile" | "desktop" }) {
-  if (variant === "mobile") {
-    return (
-      <div className="relative mx-auto aspect-[4/5] w-full max-w-[420px]">
-        <div
-          aria-hidden="true"
-          className="absolute left-1/2 top-1/2 h-[75%] w-[75%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/15 blur-[45px]"
-        />
-        <div
-          className="absolute left-1/2 top-[4%] w-[62%] -translate-x-1/2 aspect-[382/535]"
-          style={{
-            maskImage: "radial-gradient(ellipse at center, black 78%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 78%, transparent 100%)",
-          }}
-        >
-          <Image src="/images/hero-case.png" alt="Custom jersey with dragon design in a glass display case" fill sizes="260px" className="object-contain" />
-        </div>
-        <div className="absolute bottom-[6%] left-0 w-[26%] aspect-[539/463] drop-shadow-[0_10px_16px_rgba(0,0,0,0.6)]" style={REFLECT_STYLE}>
-          <Image src="/images/hero-ball.png" alt="Branded GTS football" fill sizes="110px" className="object-contain" />
-        </div>
-        <div className="absolute bottom-[8%] right-0 w-[34%] aspect-[697/358] drop-shadow-[0_10px_16px_rgba(0,0,0,0.6)]" style={REFLECT_STYLE}>
-          <Image src="/images/hero-bag-cutout.png" alt="Branded GTS duffel bag" fill sizes="145px" className="object-contain" />
-        </div>
-      </div>
-    )
-  }
-
-  // Desktop: absolutely positioned within the hero section, percentages
-  // matched against the reference mockup's own pixel dimensions.
+/**
+ * Homepage hero: what GTS makes and where, a line-up of GTS jersey designs,
+ * then the ordering actions.
+ *
+ * The source order is headline -> description -> jerseys -> actions, which
+ * is exactly how phones and tablets show it (the image sits between the
+ * description and "Start Customizing"). From `lg` up a two-column grid puts
+ * the image beside the text, spanning both text rows. Server-rendered with
+ * a CSS-only entrance, no animation library.
+ */
+export function Hero({ whatsapp }: { whatsapp?: string | null }) {
   return (
-    <div className="absolute inset-0 z-[5] hidden md:block">
-      <div className="absolute left-[52%] top-[10%] w-[29%] aspect-[382/535]">
-        <div
-          aria-hidden="true"
-          className="absolute left-1/2 top-1/2 h-[80%] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-brand-green)]/15 blur-[50px]"
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            maskImage: "radial-gradient(ellipse at center, black 78%, transparent 100%)",
-            WebkitMaskImage: "radial-gradient(ellipse at center, black 78%, transparent 100%)",
-          }}
-        >
-          <Image src="/images/hero-case.png" alt="Custom jersey with dragon design in a glass display case" fill priority sizes="29vw" className="object-contain" />
-        </div>
-      </div>
-
-      <div className="absolute left-[42%] top-[73%] w-[7.6%] aspect-[539/463] drop-shadow-[0_12px_20px_rgba(0,0,0,0.6)]" style={REFLECT_STYLE}>
-        <Image src="/images/hero-ball.png" alt="Branded GTS football" fill sizes="8vw" className="object-contain" />
-      </div>
-
-      <div className="absolute left-[82%] top-[64%] w-[15%] aspect-[697/358] drop-shadow-[0_12px_20px_rgba(0,0,0,0.6)]" style={REFLECT_STYLE}>
-        <Image src="/images/hero-bag-cutout.png" alt="Branded GTS duffel bag" fill sizes="15vw" className="object-contain" />
-      </div>
-
-      <div className="glass-bevel absolute left-[82%] top-[20%] hidden w-[16%] flex-col gap-5 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-5 backdrop-blur-[16px] xl:flex">
-        {CATEGORIES.map(({ icon: Icon, title, subtitle }) => (
-          <Link key={title} href="/products" className="group flex items-center gap-3 whitespace-nowrap">
-            <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[var(--glass-border)] text-[var(--color-brand-green)] transition-colors group-hover:border-[var(--color-brand-green)] group-hover:bg-[var(--color-brand-green)]/10">
-              <Icon className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block text-sm font-bold text-white">{title}</span>
-              <span className="block text-xs text-[var(--color-text-gray)]">{subtitle}</span>
-            </span>
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-export function Hero() {
-  return (
-    <section className="relative overflow-hidden px-6 pb-8 pt-32 md:min-h-[700px] md:pb-10 lg:min-h-[780px]">
-      {/* Frosted-glass fade at the bottom edge - blends the section into
-          whatever follows (Footer) instead of an abrupt hard cutoff. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[6] h-24 bg-white/5 backdrop-blur-md [mask-image:linear-gradient(to_top,black,transparent)]"
-      />
-      {/* ONE shared background image - cropped differently per breakpoint via
-          object-position, instead of two separate files (which is what was
-          intermittently failing to load on mobile). */}
-      <div className="absolute inset-0">
-        <Image
-          src="/images/hero-bg-desktop.webp"
-          alt=""
-          fill
-          priority
-          className="object-cover object-[68%_center] md:object-center"
-        />
-      </div>
-
-      {/* Desktop scene - absolutely positioned, unaffected by text length */}
-      <Scene variant="desktop" />
-
-      <div className="relative z-10 mx-auto max-w-[1300px]">
-        <div className="max-w-[560px] text-center md:text-left">
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0}
-            className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-white"
-          >
-            Custom Team Sportswear
-          </motion.p>
-
-          <motion.h1
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0.1}
-            className="mb-6 text-4xl font-extrabold uppercase leading-[1.1] tracking-tight sm:text-5xl"
-          >
+    <section className="page-top relative">
+      {/* From xl the text column is just wide enough for the two-line
+          statement (33rem at its full 68px size) and the image takes the
+          rest, so the jerseys get as much width as the headline allows. */}
+      <div className="container-site grid gap-x-10 pb-12 pt-4 sm:pt-8 lg:grid-cols-[1.05fr_0.95fr] lg:grid-rows-[auto_1fr] lg:pb-20 xl:grid-cols-[minmax(0,33rem)_minmax(0,1fr)]">
+        <div className="rise-in flex max-w-xl flex-col lg:col-start-1 lg:row-start-1 lg:self-end">
+          {/* The eyebrow line is part of the h1 so the page's main heading
+              says what GTS makes and where, not just the tagline. */}
+          <h1 className="display-xl">
+            <span className="eyebrow mb-5 block">Custom Jersey Printing in Kathmandu, Nepal</span>
             Create your team.
             <br />
             Wear your <span className="text-[var(--color-brand-green)]">identity.</span>
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0.2}
-            className="mb-8 text-base leading-relaxed text-[var(--color-text-gray)]"
-          >
-            Design custom jerseys, tracksuits, hoodies, and gym wear for your
-            team, college, or company. Pick your options, get an instant quote,
-            and order — no account needed.
-          </motion.p>
-
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0.25}
-            className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4"
-          >
-            {FEATURES.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-col items-center gap-2 md:items-start">
-                <Icon className="h-6 w-6 text-[var(--color-brand-green)]" strokeWidth={2} />
-                <span className="whitespace-pre-line text-xs font-bold uppercase leading-tight text-white">
-                  {label}
-                </span>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0.3}
-            className="mb-8 flex flex-wrap items-center justify-center gap-4 md:justify-start"
-          >
-            <Button asChild size="lg">
-              <Link href="/products" className="group">
-                Start Customizing{" "}
-                <span className="inline-block text-lg leading-none transition-transform duration-200 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/process" className="flex items-center gap-2">
-                <PlayCircle className="h-4 w-4" />
-                Watch How It Works
-              </Link>
-            </Button>
-          </motion.div>
+          <p className="lead mt-5 sm:mt-6">
+            Football, cricket, basketball, volleyball and esports jerseys, plus{" "}
+            <span className="whitespace-nowrap">T-shirts</span>, hoodies and tracksuits, for teams, schools, clubs and
+            companies - designed with you, made by GoalThali Sports and delivered across Nepal.
+          </p>
         </div>
 
-        {/* Mobile scene - normal document flow, placed here (after the CTA
-            buttons, before Our Sports) so it can never overlap the navbar or
-            header text regardless of how tall they render. */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-10 md:hidden"
-        >
-          <Scene variant="mobile" />
-        </motion.div>
-
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0.35} className="max-w-[560px]">
-          <p className="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.1em] text-white">
-            Sports
-            <span className="h-px max-w-[120px] flex-1 bg-white/40" />
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:justify-start">
-            {SPORTS.map((sport) => (
-              <div key={sport.label} className="flex flex-col items-center gap-1.5">
-                <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-white/95">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- small fixed icon, next/image overhead not needed */}
-                  <img src={sport.icon} alt={sport.label} className="h-6 w-6 object-contain" />
-                </span>
-                <span className="text-xs text-[var(--color-text-gray)]">{sport.label}</span>
-              </div>
-            ))}
+        {/* The negative right margin runs the image out to the navbar pill's
+            right edge, which sits 16px past the content on smaller laptops
+            and a full 32px gutter past it from xl. */}
+        <figure className="rise-in relative mx-auto mt-7 w-full max-w-[560px] [animation-delay:100ms] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:-mr-4 lg:ml-0 lg:mt-0 lg:w-auto lg:max-w-none lg:self-center xl:-mr-8">
+          <div
+            aria-hidden="true"
+            className="absolute inset-[10%] -z-10 rounded-full bg-[var(--color-brand-green)]/15 blur-[60px]"
+          />
+          {/* The image is a 3:2 line-up of four jerseys, so the frame keeps
+              that shape at every size - any crop would cut off a sport. */}
+          <div className="relative aspect-[3/2] overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-line-strong)] bg-black shadow-[0_24px_60px_rgba(0,0,0,0.5)]">
+            <Image
+              src="/images/hero-case.webp"
+              alt="GTS concept jerseys for football, basketball, volleyball and cricket on display under the GoalThali Sports logo"
+              fill
+              // The page's LCP image: fetched first, at high priority (what
+              // Next 16 recommends over `preload` for a single hero image).
+              loading="eager"
+              fetchPriority="high"
+              sizes="(min-width: 1280px) 600px, (min-width: 1024px) 46vw, (min-width: 640px) 560px, 92vw"
+              className="object-cover"
+            />
           </div>
-        </motion.div>
+          {/* Below the image, not over it: an overlay would cover the
+              jerseys' sport labels along the bottom edge. */}
+          <figcaption className="mt-2.5 px-1 text-xs text-[var(--color-text-gray)]">
+            <span className="font-bold text-white">GTS concept designs</span> - Your team&apos;s logo, colours, names, and
+            numbers go on the kit.
+          </figcaption>
+        </figure>
+
+        <div className="rise-in mt-8 flex max-w-xl flex-col [animation-delay:150ms] lg:col-start-1 lg:row-start-2 lg:mt-8 lg:self-start">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button asChild size="lg">
+              <Link href="/products">
+                Start Customizing <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="secondary">
+              <a href={whatsappLink(whatsapp, "Hi GoalThali Sports, I'd like a quote for custom jerseys.")} target="_blank" rel="noreferrer" data-whatsapp-cta>
+                <MessageCircle className="h-4 w-4 text-[#25D366]" aria-hidden="true" /> Chat on WhatsApp
+              </a>
+            </Button>
+          </div>
+
+          <Link
+            href="/gts-hub/contact#book-a-visit"
+            className="mt-3 inline-flex min-h-11 w-fit items-center gap-2 text-sm font-semibold text-[var(--color-text-gray)] hover:text-white"
+          >
+            <CalendarDays className="h-4 w-4 text-[var(--color-brand-green)]" aria-hidden="true" />
+            Prefer to talk in person? Book a visit
+          </Link>
+
+          <ul className="mt-6 grid grid-cols-1 gap-x-6 gap-y-3 border-t border-[var(--color-line)] pt-6 sm:grid-cols-2">
+            {FACTS.map((fact) => (
+              <li key={fact} className="flex items-start gap-2.5 text-[15px] leading-snug text-white/85">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-brand-green)]" aria-hidden="true" />
+                {fact}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   )

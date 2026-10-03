@@ -1,20 +1,20 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
+import { brandTitle, pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = {
-  title: "Customize Your Sportswear | GTS",
-  description: "Start designing custom team sportswear with GTS - pick a product category to choose your sport, fabric, and design.",
-}
+// Thin fallback that only points to /products - kept out of the index (and
+// the sitemap) so it doesn't compete with the real products page; links on
+// it are still followed.
+export const metadata: Metadata = pageMetadata({
+  title: brandTitle("Customize Your Sportswear"),
+  description: "Start designing custom team sportswear with GoalThali Sports - pick a product category to choose your sport and design.",
+  noindex: true,
+})
 
 export default function CustomizeFallbackPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
-
+    <>
       <div className="flex flex-col items-center gap-4 px-6 pt-32 pb-24 text-center">
         <h1 className="text-2xl font-bold">Choose a product to start</h1>
         <p className="max-w-md text-sm text-[var(--color-text-gray)]">
@@ -27,6 +27,6 @@ export default function CustomizeFallbackPage() {
           Browse Products
         </Link>
       </div>
-    </div>
+    </>
   )
 }

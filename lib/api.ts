@@ -15,6 +15,18 @@ import type { ContactInfo, ContactSubmission, ContactSubmissionStatus } from "./
 import type { HubSectionImage, HubSectionKey } from "./hub-section-image-types";
 import type { ContentDetailResponse, ContentListResponse } from "./gts-hub-types";
 import type { Platform } from "./platform-types";
+import type {
+  AdminAppointment,
+  AdminAppointmentList,
+  AdminSlot,
+  AppointmentStatus,
+  AvailabilitySummary,
+  BulkSlotResult,
+  DayAvailability,
+  PublicAppointment,
+} from "./appointment-types";
+import { findBySportSlug } from "./catalog";
+import { cleanImageUrl } from "./images";
 
 const envApiUrl = process.env.NEXT_PUBLIC_API_URL;
 if (!envApiUrl) {
@@ -51,9 +63,12 @@ export function clearAdminKey() {
 
 export class ApiError extends Error {
   status: number;
-  constructor(message: string, status: number) {
+  /** The backend's machine-readable reason, when it gives one (e.g. "slot_unavailable"). */
+  code?: string;
+  constructor(message: string, status: number, code?: string) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -93,7 +108,11 @@ export async function apiFetch<T = unknown>(
   const json = await res.json().catch(() => null);
 
   if (!res.ok) {
-    throw new ApiError(json?.message || `Request failed with status ${res.status}`, res.status);
+    throw new ApiError(
+      json?.message || `Request failed with status ${res.status}`,
+      res.status,
+      typeof json?.code === "string" ? json.code : undefined
+    );
   }
 
   return json as T;
@@ -160,14 +179,7 @@ export async function getContactInfo(): Promise<ContactInfo | null> {
   return json.data;
 }
 
-export async function adminUpdateContactInfo(input: {
-  phone?: string;
-  email?: string;
-  address?: string;
-  whatsapp?: string;
-  mapEmbedUrl?: string;
-  seo?: ContactInfo["seo"];
-}): Promise<ContactInfo> {
+export async function adminUpdateContactInfo(input: Partial<Omit<ContactInfo, "_id">>): Promise<ContactInfo> {
   const res = await apiFetch<ApiItemResponse<ContactInfo>>("/contact", {
     method: "PUT",
     requireAdmin: true,
@@ -245,9 +257,12 @@ export interface MainProductSummary {
 
 // Fetches active Main Products for the /products landing page - fully
 // admin-curated, separate from the per-sport sub-products under each one.
+// Called server-side by that page; `revalidate: 60` (same as the other
+// public content above) lets the page be served from cache with the
+// product links already in the HTML, instead of waiting on the backend.
 export async function fetchMainProducts(): Promise<MainProductSummary[]> {
   try {
-    const res = await fetch(`${API_URL}/main-products`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/main-products`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const json = await res.json();
     return json.data ?? [];
@@ -315,15 +330,47 @@ export interface BackendProductSummary {
   thumbnailImageUrlMobile?: string;
 }
 
-// Distinct category strings actually in use across sub-products.
+// Distinct category strings actually in use across sub-products (active ones
+// only). Cached like the other public listings: the /products page uses it
+// to pair main-product cards with real categories (lib/catalog.ts) and stays
+// statically cached.
 export async function fetchCategories(): Promise<string[]> {
   try {
-    const res = await fetch(`${API_URL}/products/categories`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/products/categories`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const json = await res.json();
     return json.data ?? [];
   } catch {
     return [];
+  }
+}
+
+// Every active sub-product (one per category + sport), for the homepage's
+// "sports we design for" links and the Our Work "create a similar design"
+// lookup. Cached like the other public listings.
+export async function fetchActiveProducts(): Promise<BackendProductSummary[]> {
+  try {
+    const res = await fetch(`${API_URL}/products`, { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    const json = await res.json();
+    const items: (BackendProductSummary & { designs?: unknown })[] = json.data ?? [];
+    // The list endpoint includes every design; only the summary is needed here.
+    return items.map(({ _id, name, category, sport }) => ({ _id, name, category, sport }));
+  } catch {
+    return [];
+  }
+}
+
+// One product by id (public endpoint), or null if it's missing or inactive.
+export async function fetchProductById(id: string): Promise<AdminProduct | null> {
+  try {
+    const res = await fetch(`${API_URL}/products/${encodeURIComponent(id)}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const product: AdminProduct | undefined = json.data;
+    return product && product.isActive !== false ? product : null;
+  } catch {
+    return null;
   }
 }
 
@@ -386,21 +433,183 @@ export async function fetchAddons(): Promise<Addon[]> {
   }
 }
 
+// Resolves a /customize/[category]/[sport] URL to its full product. The
+// sport segment is matched by slug against the category's own active
+// products (so "polo-t-shirt" finds "POLO T-SHIRT"), then that product is
+// loaded by its id - the URL value itself is never sent to the backend as a
+// lookup pattern.
 export async function fetchProductByCategorySport(
   categoryName: string,
   sport: string
 ): Promise<AdminProduct | null> {
+  const match = findBySportSlug(await fetchProductsByCategory(categoryName), sport);
+  if (!match) return null;
   try {
-    const res = await fetch(
-      `${API_URL}/products/category/${encodeURIComponent(categoryName)}/sport/${encodeURIComponent(sport)}`,
-      { cache: "no-store" }
-    );
+    const res = await fetch(`${API_URL}/products/${encodeURIComponent(match._id)}`, { cache: "no-store" });
     if (!res.ok) return null;
     const json = await res.json();
-    return json.data ?? null;
+    const product: AdminProduct | undefined = json.data;
+    // The id came from the active list moments ago - still don't show a
+    // product that was deactivated in between.
+    if (!product || product.isActive === false) return null;
+    // Design images are hand-pasted links; one pasted twice ("...pnghttps://...png")
+    // is reduced to the single URL so the design gallery doesn't show a broken image.
+    return {
+      ...product,
+      designs: (product.designs ?? []).map((design) => ({ ...design, imageUrl: cleanImageUrl(design.imageUrl) ?? "" })),
+    };
   } catch {
     return null;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Appointments (in-person visits)
+// ---------------------------------------------------------------------------
+
+// Public - the bookable date window and, per day with visiting hours, how
+// many arrival times can be picked (for the date picker). Always fresh:
+// called from the browser.
+export async function getAppointmentAvailability(): Promise<AvailabilitySummary> {
+  const res = await apiFetch<{ success: boolean; data: AvailabilitySummary }>("/appointments/availability");
+  return res.data;
+}
+
+// Public - one Kathmandu date (YYYY-MM-DD): its visiting hours and arrival
+// times. Fetched again whenever the date changes.
+export async function getAppointmentDay(date: string): Promise<DayAvailability> {
+  const res = await apiFetch<{ success: boolean; data: DayAvailability }>(
+    `/appointments/availability/${encodeURIComponent(date)}`
+  );
+  return res.data;
+}
+
+// Public - book an arrival time on a day (`slotId` is the day's hours). The
+// backend re-checks everything (day still open, time one of its times and in
+// the booking window, one booking per number per day, valid phone);
+// `requestKey` makes a repeated submit return the same booking.
+export async function requestAppointment(input: {
+  slotId: string;
+  startsAt: string;
+  name: string;
+  phone: string;
+  reason?: string;
+  requestKey: string;
+}): Promise<PublicAppointment> {
+  const res = await apiFetch<{ success: boolean; data: PublicAppointment }>("/appointments", {
+    method: "POST",
+    body: input,
+  });
+  return res.data;
+}
+
+// Public - status by booking reference, for the confirmation/status page
+// (server-side, never cached). Returns null when there's no such booking.
+export async function getAppointmentStatus(reference: string): Promise<PublicAppointment | null> {
+  const res = await fetch(`${API_URL}/appointments/status/${encodeURIComponent(reference)}`, { cache: "no-store" });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new ApiError(`Failed to load the booking (${res.status})`, res.status);
+  const json: { data: PublicAppointment } = await res.json();
+  return json.data;
+}
+
+export async function adminListAppointments(params: {
+  view?: "upcoming" | "past" | "all";
+  status?: AppointmentStatus | "";
+  from?: string;
+  to?: string;
+  page?: number;
+}): Promise<AdminAppointmentList> {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") query.set(key, String(value));
+  }
+  return apiFetch<AdminAppointmentList>(`/appointments/admin?${query}`, { requireAdmin: true });
+}
+
+export async function adminSetAppointmentStatus(
+  id: string,
+  status: "confirmed" | "cancelled" | "completed",
+  note?: string
+): Promise<AdminAppointment> {
+  const res = await apiFetch<ApiItemResponse<AdminAppointment>>(`/appointments/admin/${id}/status`, {
+    method: "PATCH",
+    requireAdmin: true,
+    body: { status, note },
+  });
+  return res.data;
+}
+
+// Moves a booking to an arrival time on a day (the same day or another).
+export async function adminRescheduleAppointment(id: string, slotId: string, startsAt: string): Promise<AdminAppointment> {
+  const res = await apiFetch<ApiItemResponse<AdminAppointment>>(`/appointments/admin/${id}/reschedule`, {
+    method: "PATCH",
+    requireAdmin: true,
+    body: { slotId, startsAt },
+  });
+  return res.data;
+}
+
+export async function adminUpdateAppointmentNote(id: string, adminNote: string): Promise<AdminAppointment> {
+  const res = await apiFetch<ApiItemResponse<AdminAppointment>>(`/appointments/admin/${id}/note`, {
+    method: "PATCH",
+    requireAdmin: true,
+    body: { adminNote },
+  });
+  return res.data;
+}
+
+export async function adminDeleteAppointment(id: string): Promise<void> {
+  await apiFetch(`/appointments/admin/${id}`, { method: "DELETE", requireAdmin: true });
+}
+
+export async function adminListSlots(from?: string, to?: string): Promise<AdminSlot[]> {
+  const query = new URLSearchParams();
+  if (from) query.set("from", from);
+  if (to) query.set("to", to);
+  const res = await apiFetch<{ success: boolean; data: AdminSlot[] }>(`/appointments/admin/slots?${query}`, {
+    requireAdmin: true,
+  });
+  return res.data;
+}
+
+// A day's visiting hours - one slot per day; any number of customers can
+// book each time in it.
+export interface SlotInput {
+  startTime: string;
+  endTime: string;
+  isActive: boolean;
+  note: string;
+}
+
+// The same hours on every ticked weekday (0 = Sunday) between two dates; a
+// date that already has a slot is skipped and reported.
+export async function adminBulkCreateSlots(input: {
+  fromDate: string;
+  toDate: string;
+  weekdays: number[];
+  startTime: string;
+  endTime: string;
+}): Promise<BulkSlotResult> {
+  const res = await apiFetch<{ success: boolean; data: BulkSlotResult }>("/appointments/admin/slots/bulk", {
+    method: "POST",
+    requireAdmin: true,
+    body: input,
+  });
+  return res.data;
+}
+
+export async function adminUpdateSlot(id: string, input: Partial<SlotInput>): Promise<AdminSlot> {
+  const res = await apiFetch<ApiItemResponse<AdminSlot>>(`/appointments/admin/slots/${id}`, {
+    method: "PUT",
+    requireAdmin: true,
+    body: input,
+  });
+  return res.data;
+}
+
+export async function adminDeleteSlot(id: string): Promise<void> {
+  await apiFetch(`/appointments/admin/slots/${id}`, { method: "DELETE", requireAdmin: true });
 }
 
 // ---------------------------------------------------------------------------

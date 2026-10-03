@@ -11,8 +11,12 @@ import {
   computeQuote,
   getTierPrice,
   computeVariantSurcharge,
+  quoteBlocker,
   type AddonSelection,
 } from "@/lib/pricing"
+import { groupAddonsByName } from "@/lib/addon-groups"
+import { formatMoney } from "@/lib/money"
+import { whatsappLink } from "@/lib/site"
 import { MOCK_COUPON } from "@/lib/mock-products"
 import { saveOrderDraft, fileToDataUrl } from "@/lib/order-draft"
 import { loadUploadedDesignImage, clearUploadedDesignImage } from "@/lib/uploaded-design"
@@ -89,6 +93,10 @@ export function Customizer({ product, selectedDesign, categoryId, sportSlug }: C
     )
   }, [product, selectedDesign, quantity, variantSurcharge, addons, deadlineDate, couponCode])
 
+  // A quantity outside the product's price tiers (or a zero total) can't be
+  // ordered online - it gets a custom quote instead of a Rs 0 order.
+  const blocker = quoteBlocker(product.pricingTiers, quantity, quote.total)
+
   const handleFieldChange = (key: string, value: ConfigFieldValue) => {
     setFieldValues((prev) => ({ ...prev, [key]: value }))
   }
@@ -121,6 +129,7 @@ export function Customizer({ product, selectedDesign, categoryId, sportSlug }: C
     })
 
   async function handleGetQuotation() {
+    if (quantity <= 0 || blocker) return
     const convertedFiles = await Promise.all(
       additionalFiles.map(async (file) => ({
         filename: file.name,
@@ -129,6 +138,7 @@ export function Customizer({ product, selectedDesign, categoryId, sportSlug }: C
     )
 
     saveOrderDraft({
+      productId: product.id,
       productName: product.name,
       designName: selectedDesign?.name ?? "Custom upload",
       designImageUrl: effectiveSelectedDesign?.imageUrl,
@@ -185,9 +195,11 @@ export function Customizer({ product, selectedDesign, categoryId, sportSlug }: C
               <input
                 id="total-quantity"
                 type="number"
+                inputMode="numeric"
                 min={0}
+                step={1}
                 value={quantity || ""}
-                onChange={(e) => setQuantity(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setQuantity(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
                 className="w-32 rounded-[var(--radius-md)] border border-[var(--glass-border)] bg-black/20 px-3 py-2 text-lg font-bold text-[var(--color-brand-green)] focus:border-[var(--color-brand-green)] focus:outline-none"
               />
             </div>
@@ -244,7 +256,7 @@ export function Customizer({ product, selectedDesign, categoryId, sportSlug }: C
                 onChange={setPlayers}
                 sleeveOptions={sleeveField?.options ?? []}
                 neckOptions={collarField?.options ?? []}
-                addonOptions={product.addons.map((a) => a.name)}
+                addonOptions={groupAddonsByName(product.addons).map((g) => g.name)}
                 hideHeader
               />
             </div>
@@ -342,17 +354,33 @@ export function Customizer({ product, selectedDesign, categoryId, sportSlug }: C
           </Card>
 
           <div className="flex flex-col items-center gap-3">
-            <div className="flex items-baseline gap-2">
-              <span className="text-sm font-semibold text-[var(--color-text-gray)]">Estimated total</span>
-              <span className="text-xl font-extrabold text-white" data-testid="order-total">
-                {quote.currency}
-                {quote.total.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-              </span>
-            </div>
+            {blocker ? (
+              <div role="status" className="notice notice-warning flex max-w-xl flex-col items-center gap-3 text-center">
+                <p>{blocker}</p>
+                <a
+                  href={whatsappLink(
+                    undefined,
+                    `Hi GoalThali Sports, I'd like a custom quote: ${product.name}, design "${selectedDesign?.name ?? "custom"}", ${quantity} pcs.`
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-[var(--radius-pill)] bg-[#25D366] px-5 py-2.5 text-sm font-bold text-[#06210f]"
+                >
+                  Ask for a custom quote on WhatsApp
+                </a>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-2">
+                <span className="text-sm font-semibold text-[var(--color-text-gray)]">Estimated total</span>
+                <span className="text-xl font-extrabold text-white" data-testid="order-total">
+                  {formatMoney(quote.currency, quote.total)}
+                </span>
+              </div>
+            )}
             <button
               type="button"
               onClick={handleGetQuotation}
-              disabled={quantity <= 0}
+              disabled={quantity <= 0 || Boolean(blocker)}
               className="w-full rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-6 py-3 text-sm font-bold text-[var(--color-bg-dark)] transition-transform hover:enabled:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
             >
               Get Quotation →

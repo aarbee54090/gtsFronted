@@ -1,7 +1,5 @@
 "use client"
 
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Card } from "@/components/customize/Card"
 import { RequireCustomer } from "@/components/account/RequireCustomer"
 import { AccountNav } from "@/components/account/AccountNav"
@@ -36,16 +34,14 @@ function AccountOverview() {
 
 export default function AccountPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <>
       <div className="mx-auto max-w-[640px] px-6 pb-24 pt-32">
-        <h1 className="mb-6 text-3xl font-bold text-white">My Account</h1>
+        <h1 className="display-lg mb-6">My Account</h1>
         <RequireCustomer>
           <AccountNav />
           <AccountOverview />
         </RequireCustomer>
       </div>
-    </div>
+    </>
   )
 }

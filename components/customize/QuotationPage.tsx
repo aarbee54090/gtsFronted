@@ -11,10 +11,7 @@ import { useCustomerAuth } from "@/components/account/CustomerAuthContext"
 import { setPendingAction } from "@/lib/pending-action"
 import { apiFetch } from "@/lib/api"
 import { Card } from "./Card"
-
-function formatMoney(currency: string, amount: number) {
-  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-}
+import { formatMoney } from "@/lib/money"
 
 export function QuotationPage() {
   const router = useRouter()
@@ -77,15 +74,15 @@ export function QuotationPage() {
       ...descriptionLines,
       "",
       `Quantity: ${draft!.quantity}`,
-      `Unit price: ${quote.currency}${quote.unitPrice}`,
-      `Line total: ${quote.currency}${quote.lineTotal}`,
-      quote.variantSurcharge > 0 ? `Sleeve/Collar surcharge: ${quote.currency}${quote.variantSurcharge}` : null,
-      quote.addonsTotal > 0 ? `Addons: ${quote.currency}${quote.addonsTotal}` : null,
-      quote.discount > 0 ? `Discount: -${quote.currency}${quote.discount}` : null,
+      `Unit price: ${formatMoney(quote.currency, quote.unitPrice)}`,
+      `Line total: ${formatMoney(quote.currency, quote.lineTotal)}`,
+      quote.variantSurcharge > 0 ? `Sleeve/Collar surcharge: ${formatMoney(quote.currency, quote.variantSurcharge)}` : null,
+      quote.addonsTotal > 0 ? `Addons: ${formatMoney(quote.currency, quote.addonsTotal)}` : null,
+      quote.discount > 0 ? `Discount: -${formatMoney(quote.currency, quote.discount)}` : null,
       draft!.deadlineDate ? `Deadline: ${draft!.deadlineDate}` : null,
       draft!.couponCode ? `Coupon: ${draft!.couponCode}` : null,
       "",
-      `Total: ${quote.currency}${quote.total}`,
+      `Total: ${formatMoney(quote.currency, quote.total)}`,
       "",
       "Estimated preview — final price confirmed at checkout.",
     ].filter((line): line is string => line !== null)
@@ -169,7 +166,7 @@ export function QuotationPage() {
         </div>
 
         {descriptionLines.length > 0 && (
-          <ul className="glass-surface flex flex-col gap-1 rounded-[var(--radius-md)] p-3 text-xs text-[var(--color-text-gray)]">
+          <ul className="glass-2 flex flex-col gap-1 rounded-[var(--radius-md)] p-3 text-xs text-[var(--color-text-gray)]">
             {descriptionLines.map((line, i) => (
               <li key={i}>{line}</li>
             ))}
@@ -231,15 +228,29 @@ export function QuotationPage() {
           </span>
         </div>
 
-        <Link
-          href={`/customize/${draft.categoryId}/${draft.sportSlug}/checkout`}
-          className="rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-6 py-3 text-center text-sm font-bold text-[var(--color-bg-dark)] transition-transform hover:-translate-y-0.5"
-        >
-          Proceed to Checkout →
-        </Link>
-        <p className="text-center text-xs text-[var(--color-text-gray)]">
-          Estimated preview — final price confirmed at checkout.
-        </p>
+        {quote.total > 0 ? (
+          <>
+            <Link
+              href={`/customize/${draft.categoryId}/${draft.sportSlug}/checkout`}
+              className="rounded-[var(--radius-pill)] bg-[var(--color-brand-green)] px-6 py-3 text-center text-sm font-bold text-[var(--color-bg-dark)] transition-transform hover:-translate-y-0.5"
+            >
+              Proceed to Checkout →
+            </Link>
+            <p className="text-center text-xs text-[var(--color-text-gray)]">
+              Estimated preview — final price confirmed at checkout.
+            </p>
+          </>
+        ) : (
+          // Only reachable from a draft saved before unpriced quantities
+          // were blocked in the customizer.
+          <p role="status" className="notice notice-warning text-center">
+            There&apos;s no set price for this quantity, so it can&apos;t be ordered online.{" "}
+            <Link href="/gts-hub/contact" className="font-semibold underline underline-offset-4">
+              Contact us for a custom quote
+            </Link>
+            .
+          </p>
+        )}
       </Card>
     </div>
   )

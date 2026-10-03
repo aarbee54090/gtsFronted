@@ -1,6 +1,7 @@
 "use client"
 
 import type { ConfigField, ConfigFieldValue } from "@/lib/types"
+import { CURRENCY, formatMoney } from "@/lib/money"
 
 export type { ConfigFieldValue }
 
@@ -121,7 +122,7 @@ export function ConfigFieldInput({ field, value, onChange, maxTotal }: ConfigFie
                 </label>
                 {!!optionPrice && (
                   <span className="text-xs font-semibold text-[var(--color-brand-green)]">
-                    (+₹{optionPrice}/pc)
+                    (+{formatMoney(CURRENCY, optionPrice)}/pc)
                   </span>
                 )}
               </div>

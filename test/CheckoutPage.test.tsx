@@ -36,7 +36,7 @@ const sampleDraft: OrderDraft = {
     couponDiscount: 0,
     discount: 0,
     total: 1000,
-    currency: "₹",
+    currency: "₹", // a draft saved before prices switched to Rs - still shown as Rs
   },
 }
 
@@ -68,8 +68,8 @@ describe("CheckoutPage", () => {
     saveOrderDraft(sampleDraft)
     render(<CheckoutPage />)
     await waitFor(() => {
-      expect(screen.getByText("₹400")).toBeInTheDocument()
-      expect(screen.getByText("₹600")).toBeInTheDocument()
+      expect(screen.getByText("Rs 400")).toBeInTheDocument()
+      expect(screen.getByText("Rs 600")).toBeInTheDocument()
     })
   })
 

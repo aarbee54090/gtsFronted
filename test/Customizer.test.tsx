@@ -40,8 +40,8 @@ describe("Customizer", () => {
 
   it("shows the per-piece surcharge next to Full Sleeve and Collar, not other options", () => {
     render(<Customizer product={jerseyKit} selectedDesign={{ name: "Classic Stripe" }} categoryId="jersey-kit" sportSlug="football" />)
-    expect(screen.getByText("(+₹120/pc)")).toBeInTheDocument()
-    expect(screen.getByText("(+₹125/pc)")).toBeInTheDocument()
+    expect(screen.getByText("(+Rs 120/pc)")).toBeInTheDocument()
+    expect(screen.getByText("(+Rs 125/pc)")).toBeInTheDocument()
   })
 
   it("derives total quantity from Sleeve Type by default", () => {
@@ -94,26 +94,21 @@ describe("Customizer", () => {
     await user.clear(halfSleeveInput)
     await user.type(halfSleeveInput, "1")
 
-    expect(screen.getByTestId("order-total")).toHaveTextContent("₹300")
+    expect(screen.getByTestId("order-total")).toHaveTextContent("Rs 300")
   })
 
   it("prices an addon using the selected style, not a flat addon price", async () => {
     const user = userEvent.setup()
     render(<Customizer product={jerseyKit} selectedDesign={{ name: "Classic Stripe" }} categoryId="jersey-kit" sportSlug="football" />)
 
-    const halfSleeveInput = screen.getByLabelText("Half Sleeve")
-    await user.clear(halfSleeveInput)
-    await user.type(halfSleeveInput, "1")
+    await user.type(screen.getByLabelText("Total quantity"), "1")
 
-    // Addons are collapsed by default - expand the first one (Shorts) before its style options appear.
-    const addonToggles = screen.getAllByRole("button", { name: /shorts/i })
-    await user.click(addonToggles[0])
+    // Addon types start collapsed - open Shorts. Track has an identically
+    // labeled style; the Add button's name carries the type.
+    await user.click(screen.getByRole("button", { name: /^shorts/i }))
+    await user.click(screen.getByRole("button", { name: "Add Shorts: Full Design Print" }))
 
-    // Track has an identically-labeled style, so pick the first match (Shorts, now expanded).
-    const fullDesignButtons = screen.getAllByRole("button", { name: /full design print/i })
-    await user.click(fullDesignButtons[0])
-
-    expect(screen.getByTestId("order-total")).toHaveTextContent("₹700")
+    expect(screen.getByTestId("order-total")).toHaveTextContent("Rs 700")
   })
 
   it("still applies tier pricing to the total", async () => {
@@ -128,21 +123,21 @@ describe("Customizer", () => {
     await user.clear(halfSleeveInput)
     await user.type(halfSleeveInput, "1")
 
-    expect(screen.getByTestId("order-total")).toHaveTextContent("₹500")
+    expect(screen.getByTestId("order-total")).toHaveTextContent("Rs 500")
   })
 
-  it("adds the Full Sleeve surcharge (₹120/pc) into the total", async () => {
+  it("adds the Full Sleeve surcharge (Rs 120/pc) into the total", async () => {
     const user = userEvent.setup()
     render(<Customizer product={jerseyKit} selectedDesign={{ name: "Classic Stripe" }} categoryId="jersey-kit" sportSlug="football" />)
 
     const fullSleeveInput = screen.getByLabelText("Full Sleeve")
     await user.clear(fullSleeveInput)
-    await user.type(fullSleeveInput, "2") // 2 x ₹120 = ₹240
+    await user.type(fullSleeveInput, "2") // 2 x Rs 120 = Rs 240
 
-    expect(screen.getByTestId("order-total")).toHaveTextContent("₹240")
+    expect(screen.getByTestId("order-total")).toHaveTextContent("Rs 240")
   })
 
-  it("adds the Collar surcharge (₹125/pc), but not Round Neck/V-Neck", async () => {
+  it("adds the Collar surcharge (Rs 125/pc), but not Round Neck/V-Neck", async () => {
     const user = userEvent.setup()
     render(<Customizer product={jerseyKit} selectedDesign={{ name: "Classic Stripe" }} categoryId="jersey-kit" sportSlug="football" />)
 
@@ -152,9 +147,9 @@ describe("Customizer", () => {
 
     const collarInput = screen.getByLabelText("Collar")
     await user.clear(collarInput)
-    await user.type(collarInput, "2") // 2 x ₹125 = ₹250
+    await user.type(collarInput, "2") // 2 x Rs 125 = Rs 250
 
-    expect(screen.getByTestId("order-total")).toHaveTextContent("₹250")
+    expect(screen.getByTestId("order-total")).toHaveTextContent("Rs 250")
   })
 
   it("shows the chosen design name with a link back to change it", () => {

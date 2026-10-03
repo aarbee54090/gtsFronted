@@ -10,9 +10,11 @@ export function RelatedContentSection({ related }: RelatedContentSectionProps) {
   if (!related || related.length === 0) return null
 
   return (
-    <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold text-white">Related Content</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <section aria-labelledby="related-heading" className="flex flex-col gap-6">
+      <h2 id="related-heading" className="display-md">
+        Related from the GTS Hub
+      </h2>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {related.map((entry) => (
           <ContentCard
             key={`${entry.contentType}-${entry.item._id}`}

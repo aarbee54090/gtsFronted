@@ -13,9 +13,9 @@ export function PlatformCard({ platform }: PlatformCardProps) {
       href={platform.url}
       target="_blank"
       rel="noreferrer"
-      className="group glass-sheen glass-bevel flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-5 backdrop-blur-[16px] transition-all duration-[var(--duration-medium)] hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
+      className="group glass-sheen glass-2 flex items-center gap-4 rounded-[var(--radius-lg)] p-5 transition-all duration-[var(--duration-medium)] hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
     >
-      <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--glass-border)] bg-black/20">
+      <span className="glass-1 flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
         {platform.logo?.url ? (
           <Image src={platform.logo.url} alt={platform.name} width={44} height={44} className="h-full w-full object-cover" />
         ) : (

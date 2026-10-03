@@ -1,6 +1,6 @@
 import Link from "next/link"
-import Image from "next/image"
 import { HubMedia } from "./HubMedia"
+import { CardPhoto } from "@/components/shared/CardPhoto"
 import type { ContentType } from "@/lib/gts-hub-types"
 import { HUB_BASE_PATH, HUB_TYPE_LABEL, type CardDisplayData } from "@/lib/gts-hub-card-helpers"
 import { SaveButton } from "@/components/account/SaveButton"
@@ -10,58 +10,60 @@ interface ContentCardProps {
   data: CardDisplayData
   /** Shows a small type label badge - used in cross-type contexts like Related Content. */
   showTypeBadge?: boolean
+  /** h2 when the cards sit directly under the page's h1 (list pages); h3 under a section h2. */
+  titleAs?: "h2" | "h3"
 }
 
-export function ContentCard({ contentType, data, showTypeBadge }: ContentCardProps) {
+// The whole card is a link; the save (heart) button sits beside the link,
+// not inside it - a button nested in a link is invalid HTML and confuses
+// screen readers.
+export function ContentCard({ contentType, data, showTypeBadge, titleAs: Title = "h3" }: ContentCardProps) {
   return (
-    <Link
-      href={`${HUB_BASE_PATH[contentType]}/${data.slug}`}
-      className="group glass-sheen glass-bevel relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-[16px] transition-all duration-[var(--duration-medium)] hover:-translate-y-1 hover:border-[var(--color-brand-green)] hover:shadow-[0_0_32px_rgba(182,255,0,0.18)]"
-    >
+    <article className="group surface-card surface-card-interactive relative flex flex-col overflow-hidden">
+      <Link href={`${HUB_BASE_PATH[contentType]}/${data.slug}`} className="flex flex-1 flex-col">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
+          {data.image ? (
+            data.image.type === "video" ? (
+              <HubMedia
+                media={data.image}
+                fallbackAlt={data.title}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            ) : (
+              // The admin's mobile crop (when it's really a different image)
+              // is served to phones through <picture>; one download either way.
+              <CardPhoto
+                src={data.image.url}
+                mobileSrc={data.imageMobileUrl}
+                alt={data.image.alt?.trim() || data.title}
+                sizes="(max-width: 1024px) 50vw, 33vw"
+                mobileSizes="100vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            )
+          ) : (
+            <div className="flex h-full items-center justify-center text-xs text-[var(--color-text-gray)]">No image</div>
+          )}
+          {showTypeBadge && (
+            <span className="absolute left-3 top-3 rounded-[var(--radius-pill)] bg-black/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--color-brand-green)]">
+              {HUB_TYPE_LABEL[contentType]}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-1 flex-col gap-1.5 p-5">
+          {data.meta && <span className="eyebrow">{data.meta}</span>}
+          <Title className="card-title">{data.title}</Title>
+          {data.excerpt && <p className="card-text line-clamp-2">{data.excerpt}</p>}
+        </div>
+      </Link>
       <SaveButton
         itemType={contentType}
         itemId={data.id}
         name={data.title}
         imageUrl={data.image?.url}
         slug={data.slug}
-        className="absolute right-2 top-2 z-10"
+        className="absolute right-3 top-3 z-10"
       />
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
-        {data.image ? (
-          data.imageMobileUrl ? (
-            <>
-              <Image
-                src={data.imageMobileUrl}
-                alt={data.title}
-                fill
-                sizes="100vw"
-                className="block object-cover transition-transform group-hover:scale-105 sm:hidden"
-              />
-              <Image
-                src={data.image.url}
-                alt={data.title}
-                fill
-                sizes="(max-width: 1024px) 50vw, 33vw"
-                className="hidden object-cover transition-transform group-hover:scale-105 sm:block"
-              />
-            </>
-          ) : (
-            <HubMedia media={data.image} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
-          )
-        ) : (
-          <div className="flex h-full items-center justify-center text-xs text-gray-600">No image</div>
-        )}
-        {showTypeBadge && (
-          <span className="absolute left-2 top-2 rounded-[var(--radius-pill)] bg-black/70 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--color-brand-green)]">
-            {HUB_TYPE_LABEL[contentType]}
-          </span>
-        )}
-      </div>
-      <div className="flex flex-1 flex-col gap-1.5 p-4">
-        {data.meta && <span className="text-xs font-semibold text-[var(--color-brand-green)]">{data.meta}</span>}
-        <h3 className="text-sm font-bold text-white">{data.title}</h3>
-        {data.excerpt && <p className="line-clamp-2 text-xs text-[var(--color-text-gray)]">{data.excerpt}</p>}
-      </div>
-    </Link>
+    </article>
   )
 }

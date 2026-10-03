@@ -2,22 +2,17 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { Navbar } from "@/components/landing/Navbar"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Card } from "@/components/customize/Card"
 import { RequireCustomer } from "@/components/account/RequireCustomer"
 import { AccountNav } from "@/components/account/AccountNav"
 import { apiFetch } from "@/lib/api"
 import type { AdminOrder } from "@/lib/admin-types"
+import { formatMoney } from "@/lib/money"
 
 const STATUS_STYLES: Record<AdminOrder["status"], string> = {
   pending: "text-yellow-400 border-yellow-400/40 bg-yellow-400/10",
   approved: "text-[var(--color-brand-green)] border-[var(--color-brand-green)]/40 bg-[var(--color-brand-green)]/10",
   rejected: "text-[var(--color-error-red)] border-[var(--color-error-red)]/40 bg-[var(--color-error-red)]/10",
-}
-
-function formatMoney(currency: string, amount: number) {
-  return `${currency}${amount.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
 }
 
 function MyOrdersList() {
@@ -94,16 +89,14 @@ function MyOrdersList() {
 
 export default function MyOrdersPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
+    <>
       <div className="mx-auto max-w-[640px] px-6 pb-24 pt-32">
-        <h1 className="mb-6 text-3xl font-bold text-white">My Orders</h1>
+        <h1 className="display-lg mb-6">My Orders</h1>
         <RequireCustomer>
           <AccountNav />
           <MyOrdersList />
         </RequireCustomer>
       </div>
-    </div>
+    </>
   )
 }

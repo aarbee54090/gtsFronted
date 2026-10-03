@@ -21,12 +21,33 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
 }
 
+// The optional structured address + visit fields. Kept as one object so the
+// form below can render them from this list.
+const DETAIL_FIELDS = [
+  { key: "streetAddress", label: "Street / area", placeholder: "e.g. Kalanki" },
+  { key: "addressLocality", label: "City", placeholder: "e.g. Kathmandu" },
+  { key: "addressRegion", label: "Province", placeholder: "e.g. Bagmati" },
+  { key: "postalCode", label: "Postal code", placeholder: "Optional" },
+  { key: "openingHours", label: "Opening hours (shown on the site)", placeholder: "e.g. Sun-Fri 10:00-18:00" },
+  { key: "mapsUrl", label: "Google Maps link (for 'Get directions')", placeholder: "https://maps.app.goo.gl/..." },
+] as const
+
+type DetailKey = (typeof DETAIL_FIELDS)[number]["key"]
+
 export default function AdminContactPage() {
   const [phone, setPhone] = useState("")
   const [email, setEmail] = useState("")
   const [address, setAddress] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [mapEmbedUrl, setMapEmbedUrl] = useState("")
+  const [details, setDetails] = useState<Record<DetailKey, string>>({
+    streetAddress: "",
+    addressLocality: "",
+    addressRegion: "",
+    postalCode: "",
+    openingHours: "",
+    mapsUrl: "",
+  })
   const [seo, setSeo] = useState<SeoFields | undefined>()
 
   const [loading, setLoading] = useState(true)
@@ -47,6 +68,14 @@ export default function AdminContactPage() {
           setAddress(info.address ?? "")
           setWhatsapp(info.whatsapp ?? "")
           setMapEmbedUrl(info.mapEmbedUrl ?? "")
+          setDetails({
+            streetAddress: info.streetAddress ?? "",
+            addressLocality: info.addressLocality ?? "",
+            addressRegion: info.addressRegion ?? "",
+            postalCode: info.postalCode ?? "",
+            openingHours: info.openingHours ?? "",
+            mapsUrl: info.mapsUrl ?? "",
+          })
           setSeo(info.seo)
         }
         setSubmissions(subs)
@@ -65,7 +94,9 @@ export default function AdminContactPage() {
     setError(null)
     setSaved(false)
     try {
-      await adminUpdateContactInfo({ phone, email, address, whatsapp, mapEmbedUrl, seo })
+      const updated = await adminUpdateContactInfo({ phone, email, address, whatsapp, mapEmbedUrl, ...details, seo })
+      // The backend trims a pasted <iframe> down to its URL - show what was kept.
+      setMapEmbedUrl(updated.mapEmbedUrl ?? "")
       setSaved(true)
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Failed to save.")
@@ -104,16 +135,17 @@ export default function AdminContactPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-white">Phone</label>
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClasses} />
+              <label htmlFor="contact-phone" className="text-sm font-semibold text-white">Phone</label>
+              <input id="contact-phone" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClasses} />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-white">Email</label>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} className={inputClasses} />
+              <label htmlFor="contact-email" className="text-sm font-semibold text-white">Email</label>
+              <input id="contact-email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClasses} />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-white">WhatsApp</label>
+              <label htmlFor="contact-whatsapp" className="text-sm font-semibold text-white">WhatsApp</label>
               <input
+                id="contact-whatsapp"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder="e.g. 9779800000000"
@@ -121,19 +153,47 @@ export default function AdminContactPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-white">Address</label>
-              <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputClasses} />
+              <label htmlFor="contact-address" className="text-sm font-semibold text-white">Address (as shown on the site)</label>
+              <input id="contact-address" value={address} onChange={(e) => setAddress(e.target.value)} className={inputClasses} />
             </div>
           </div>
 
+          <fieldset className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--glass-border)] p-4">
+            <legend className="px-1 text-sm font-semibold text-white">Address details &amp; visits</legend>
+            <p className="text-xs text-[var(--color-text-gray)]">
+              Optional. When <strong>City</strong> is filled in, the Contact page also tells search engines your business
+              address (LocalBusiness structured data) - so only enter the real, current address.
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {DETAIL_FIELDS.map((field) => (
+                <div key={field.key} className="flex flex-col gap-2">
+                  <label htmlFor={`contact-${field.key}`} className="text-sm font-semibold text-white">
+                    {field.label}
+                  </label>
+                  <input
+                    id={`contact-${field.key}`}
+                    value={details[field.key]}
+                    onChange={(e) => setDetails((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    className={inputClasses}
+                  />
+                </div>
+              ))}
+            </div>
+          </fieldset>
+
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-white">Map Embed URL</label>
+            <label htmlFor="contact-map" className="text-sm font-semibold text-white">Map Embed URL</label>
             <input
+              id="contact-map"
               value={mapEmbedUrl}
               onChange={(e) => setMapEmbedUrl(e.target.value)}
               placeholder="Google Maps 'Embed a map' iframe src URL"
               className={inputClasses}
             />
+            <p className="text-xs text-[var(--color-text-gray)]">
+              Pasting the whole &lt;iframe&gt; code is fine - only its link is saved.
+            </p>
           </div>
 
           <SeoFieldsEditor value={seo} onChange={setSeo} />

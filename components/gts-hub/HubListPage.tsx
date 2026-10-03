@@ -1,10 +1,13 @@
-import Link from "next/link"
-import { Navbar } from "@/components/landing/Navbar"
 import { ContentCard } from "./ContentCard"
+import { ContextualCTA } from "./ContextualCTA"
+import { PageHeader } from "@/components/site/PageHeader"
+import { SiteShell } from "@/components/site/SiteShell"
+import { JsonLd } from "@/components/seo/JsonLd"
 import { getPublishedList } from "@/lib/api"
 import { toCardData } from "@/lib/gts-hub-card-helpers"
+import { hubTrail } from "@/lib/gts-hub-metadata"
 import type { ContentType } from "@/lib/gts-hub-types"
-import { AmbientBackground } from "@/components/shared/AmbientBackground"
+import { breadcrumbNode, jsonLd } from "@/lib/structured-data"
 
 interface HubListPageProps {
   contentType: ContentType
@@ -13,37 +16,36 @@ interface HubListPageProps {
   description: string
 }
 
+// The public list endpoint returns at most 50 per page - every hub section
+// is well under that today.
+const LIST_LIMIT = "50"
+
 export async function HubListPage({ contentType, apiBasePath, title, description }: HubListPageProps) {
   const res = await getPublishedList<Record<string, unknown> & { _id: string; slug: string }>(apiBasePath, {
-    limit: "24",
-  })
+    limit: LIST_LIMIT,
+  }).catch(() => null)
+  const trail = hubTrail(contentType)
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[var(--color-bg-dark)] text-[var(--color-text-white)]">
-      <AmbientBackground />
-      <Navbar />
-      <section className="mx-auto max-w-[1100px] px-4 pb-20 pt-32">
-        <div className="mb-4">
-          <Link href="/gts-hub" className="text-xs font-semibold text-[var(--color-text-gray)] hover:text-white">
-            ← GTS Hub
-          </Link>
-        </div>
-        <div className="mb-10 flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-white">{title}</h1>
-          <p className="text-sm text-[var(--color-text-gray)]">{description}</p>
-        </div>
+    <SiteShell>
+      <JsonLd data={jsonLd(breadcrumbNode(trail))} />
+      <PageHeader crumbs={trail.slice(0, -1)} eyebrow="GTS Hub" title={title} description={description} />
 
-        {res.data.length === 0 ? (
+      <section className="container-site flex flex-col gap-14 pb-20">
+        {!res ? (
+          <p className="notice notice-warning">This section couldn&apos;t be loaded right now. Please try again in a moment.</p>
+        ) : res.data.length === 0 ? (
           <p className="text-sm text-[var(--color-text-gray)]">Nothing published here yet - check back soon.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {res.data.map((item) => (
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              <ContentCard key={item._id} contentType={contentType} data={toCardData(contentType, item as any)} />
+              <ContentCard key={item._id} contentType={contentType} data={toCardData(contentType, item as any)} titleAs="h2" />
             ))}
           </div>
         )}
+        <ContextualCTA />
       </section>
-    </div>
+    </SiteShell>
   )
 }
