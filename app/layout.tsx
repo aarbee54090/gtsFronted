@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Inter } from "next/font/google";
 import "./globals.css";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { CustomerAuthProvider } from "@/components/account/CustomerAuthContext";
 import { SavedDesignsProvider } from "@/components/account/SavedDesignsContext";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CustomerAuthProvider>
           <SavedDesignsProvider>{children}</SavedDesignsProvider>
         </CustomerAuthProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   );
